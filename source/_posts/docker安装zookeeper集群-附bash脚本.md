@@ -1,7 +1,9 @@
 ---
 title: docker安装zookeeper集群(附bash脚本)
 date: 2020-12-14 18:27:37
-tags:
+tags: 
+  - docker
+  - 后端开发
 ---
 - 准备一个文件夹并进入此文件夹， 例如
 
@@ -19,7 +21,7 @@ tags:
 
   文件内容如下:  
 
-  ```yml
+  ```yaml
   version: '3.7'
   networks:
     zk_cluster:

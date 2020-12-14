@@ -3,7 +3,7 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
+title: Windlively
 subtitle: ''
 description: ''
 keywords:
@@ -106,6 +106,6 @@ deploy:
   type: git
   # repository: https://github.com/windlively/windlively.github.io
   repo:
-    github: https://github.com/windlively/windlively.github.io
-    gitee: https://gitee.com/windlively/windlively
-  branch: view
+    github: https://github.com/windlively/windlively.github.io,view
+    gitee: https://gitee.com/windlively/windlively,view
+  # branch: view
