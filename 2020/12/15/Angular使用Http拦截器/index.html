@@ -19,7 +19,7 @@
   <meta name="description" content="">
   <meta name="author" content="Bai JunHan">
   <meta name="keywords" content="">
-  <title>docker安装zookeeper集群(附bash脚本) - Windlively</title>
+  <title>Angular使用Http拦截器 - Windlively</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
 
@@ -166,7 +166,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="docker安装zookeeper集群(附bash脚本)">
+            <span class="h2" id="subtitle" title="Angular使用Http拦截器">
               
             </span>
 
@@ -181,8 +181,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2020-12-14 18:27" pubdate>
-        2020年12月14日 晚上
+      <time datetime="2020-12-15 00:56" pubdate>
+        2020年12月15日 凌晨
       </time>
     </span>
   
@@ -193,7 +193,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      739 字
+      1k 字
     </span>
   
 
@@ -203,7 +203,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      12
+      14
        分钟
     </span>
   
@@ -241,7 +241,7 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">docker安装zookeeper集群(附bash脚本)</h1>
+            <h1 style="display: none">Angular使用Http拦截器</h1>
             
               <p class="note note-info">
                 
@@ -250,131 +250,104 @@
               </p>
             
             <div class="markdown-body">
-              <ul>
-<li><p>准备一个文件夹并进入此文件夹， 例如</p>
-<p><code>mkdir -p ~/docker-app/zookeeper &amp;&amp; cd ~/docker-app/zookeeper</code></p>
-</li>
-<li><p>准备三个文件夹并写入zookeeper的myid</p>
-<p><code>mkdir -p zoo1/data &amp;&amp; echo 1 &gt; zoo1/data/myid</code><br><code>mkdir -p zoo2/data &amp;&amp; echo 2 &gt; zoo2/data/myid</code><br><code>mkdir -p zoo3/data &amp;&amp; echo 3 &gt; zoo3/data/myid</code>  </p>
-</li>
-<li><p>创建一个docker-compose.yml文件并编辑  </p>
-<p><code>vim docker-compose.yml</code></p>
-<p>文件内容如下:  </p>
-<div class="code-wrapper"><pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml">version: &#39;3.7&#39;
-networks:
-  zk_cluster:
-    name: zk_cluster #为集群创建一个网络
-    driver: bridge
-#集群中的服务(3个节点)
-services:
-  zoo1:
-    image: zookeeper #所使用的镜像
-    restart: always #容器异常时是否重启
-    container_name: zoo1 #容器名称
-    ports: #与宿主机的端口映射
-      - 2181:2181
-      - 8001:8080
-    # zookeeper的配置
-    environment:
-      ZOO_MY_ID: 1
-      ZOO_SERVERS: server.1&#x3D;0.0.0.0:2888:3888;2181 server.2&#x3D;zoo2:2888:3888;2181 server.3&#x3D;zoo3:2888:3888;2181
-    #容器目录映射，此处使用了相对路径
-    volumes:
-      - .&#x2F;zoo1&#x2F;data:&#x2F;data
-      - .&#x2F;zoo1&#x2F;datalog:&#x2F;datalog
-    #所使用的网络
-    networks:
-      - zk_cluster
-  zoo2:
-    image: zookeeper
-    restart: always
-    container_name: zoo2
-    ports:
-      - 2182:2181
-      - 8002:8080
-    environment:
-      ZOO_MY_ID: 2
-      ZOO_SERVERS: server.1&#x3D;zoo1:2888:3888;2181 server.2&#x3D;0.0.0.0:2888:3888;2181 server.3&#x3D;zoo3:2888:3888;2181
-    volumes:
-      - .&#x2F;zoo2&#x2F;data:&#x2F;data
-      - .&#x2F;zoo2&#x2F;datalog:&#x2F;datalog
-    networks:
-      - zk_cluster
-  zoo3:
-    image: zookeeper
-    restart: always
-    container_name: zoo3
-    ports:
-      - 2183:2181
-      - 8003:8080
-    environment:
-      ZOO_MY_ID: 3
-      ZOO_SERVERS: server.1&#x3D;zoo1:2888:3888;2181 server.2&#x3D;zoo2:2888:3888;2181 server.3&#x3D;0.0.0.0:2888:3888;2181
-    volumes:
-      - .&#x2F;zoo3&#x2F;data:&#x2F;data
-      - .&#x2F;zoo3&#x2F;datalog:&#x2F;datalog
-    networks:
-      - zk_cluster</code></pre></div></li>
-<li><p>使用docker-compose命令运行  </p>
-<p><code>docker-compose --project-directory $PWD up -d</code></p>
-</li>
-<li><p>附：一键创建docker zookeeper集群并执行的脚本（该方案仅供参考和学习，生产环境需仔细斟酌，合理修改配置参数）</p>
-<div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">#! &#x2F;bin&#x2F;bash
-
-mkdir -p zookeeper &amp;&amp; cd zookeeper
-DIR&#x3D;$PWD
-echo &quot;cd $DIR&quot;
-echo &quot;create docker compose config file&quot;
-CONF_YML&#x3D;&#39;docker-compose.yml&#39;
-touch $CONF_YML
-echo &quot;version: &#39;3.7&#39;&quot; &gt; $CONF_YML
-NET&#x3D;&#39;zk_cluster&#39;
-echo &#39;networks:&#39; &gt;&gt; $CONF_YML
-echo &quot;  $NET:&quot; &gt;&gt; $CONF_YML
-echo &quot;    name: $NET&quot; &gt;&gt; $CONF_YML
-echo &quot;    driver: bridge&quot; &gt;&gt; $CONF_YML
-#节点个数，可以修改此值创建任意数量的容器节点
-let CLUSTER_COUNT&#x3D;3 
-IMAGE&#x3D;zookeeper
-echo &quot;services:&quot; &gt;&gt; $CONF_YML
-for i in &#96;seq 1 $CLUSTER_COUNT&#96;
-do
-    echo &quot;  zoo$i:&quot; &gt;&gt; $CONF_YML
-    echo &quot;    image: $IMAGE&quot; &gt;&gt; $CONF_YML
-    echo &quot;    restart: always&quot; &gt;&gt; $CONF_YML
-    echo &quot;    container_name: zoo$i&quot; &gt;&gt; $CONF_YML
-    echo &quot;    ports:&quot; &gt;&gt; $CONF_YML
-    echo &quot;      - $[2180 + $i]:2181&quot; &gt;&gt; $CONF_YML
-    echo &quot;      - $[8000 + $i]:8080&quot; &gt;&gt; $CONF_YML
-    echo &quot;    environment:&quot; &gt;&gt; $CONF_YML
-    echo &quot;      ZOO_MY_ID: $i&quot; &gt;&gt; $CONF_YML
-    zk_srv_conf&#x3D;&#39;&#39;
-    for j in &#96;seq 1 $CLUSTER_COUNT&#96;
-    do
-        if test $i !&#x3D; $j;
-        then
-            zk_srv_conf+&#x3D;&quot;server.$j&#x3D;zoo$j:2888:3888;2181&quot;
-        else
-            zk_srv_conf+&#x3D;&quot;server.$j&#x3D;0.0.0.0:2888:3888;2181&quot;
-        fi
-        if test $j !&#x3D; $CLUSTER_COUNT;
-        then
-            zk_srv_conf+&#x3D;&#39; &#39;;
-        fi
-    done
-    echo &quot;      ZOO_SERVERS: $zk_srv_conf&quot; &gt;&gt; $CONF_YML
-    echo &quot;    volumes:&quot; &gt;&gt; $CONF_YML
-    echo &quot;      - .&#x2F;zoo$i&#x2F;data:&#x2F;data&quot; &gt;&gt; $CONF_YML
-    echo &quot;      - .&#x2F;zoo$i&#x2F;datalog:&#x2F;datalog&quot; &gt;&gt; $CONF_YML
-    echo &quot;    networks:&quot; &gt;&gt; $CONF_YML
-    echo &quot;      - $NET&quot; &gt;&gt; $CONF_YML
-    mkdir -p zoo$i&#x2F;data
-    echo $i &gt; zoo$i&#x2F;data&#x2F;myid
-done
-# docker pull zookeeper
-docker-compose --project-directory $DIR up -d</code></pre></div>
-</li>
-</ul>
+              <p>&emsp;&emsp;在前端开发的过程中，一般通过HTTP接口与后端进行数据交互，而后端一般会固定一个返回格式，例如：</p>
+<div class="code-wrapper"><pre class="line-numbers language-json" data-language="json"><code class="language-json">&#123;
+    &quot;code&quot;: 0,
+    &quot;success&quot;: true,
+    &quot;message&quot;: &quot;&quot;,
+    &quot;result&quot;:&#123;
+        &quot;id&quot;:9,
+        &quot;title&quot;:&quot;&quot;,
+        &quot;content&quot;:&quot;&quot;,
+        &quot;createTime&quot;:&quot;2020-11-25 19:22:31&quot;,
+        &quot;updateTime&quot;:&quot;2020-11-25 19:47:22&quot;,
+        &quot;available&quot;:true
+    &#125;
+&#125;</code></pre></div>
+<p>&emsp;&emsp;前端在拿到数据后，首先判断是否成功，然后取出数据体显示到页面上，但是每一次都这么去做，几乎都是重复的操作，在后端开发的过程中，有诸如过滤器、Spring提供的拦截器等工具实现对HTTP请求的统一处理，在前端其实也有类似的东西，Angular框架就提供了拦截器接口:</p>
+<div class="code-wrapper"><pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript">interface HttpInterceptor &#123;
+  intercept(req: HttpRequest&lt;any&gt;, next: HttpHandler): Observable&lt;HttpEvent&lt;any&gt;&gt;
+&#125;</code></pre></div>
+<p>&emsp;&emsp;可以实现统一的HTTP请求处理，帮助我们简化代码，并且方便代码的维护，直接放上一个我实际使用过的示例代码：</p>
+<div class="code-wrapper"><pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript">import &#123;
+  HttpErrorResponse,
+  HttpEvent,
+  HttpHandler,
+  HttpInterceptor,
+  HttpRequest,
+  HttpResponse,
+  HttpResponseBase
+&#125; from &#39;@angular&#x2F;common&#x2F;http&#39;;
+import &#123;Observable, of, throwError&#125; from &#39;rxjs&#39;;
+import &#123;Injectable&#125; from &#39;@angular&#x2F;core&#39;;
+import &#123;catchError, debounceTime, finalize, mergeMap, retry&#125; from &#39;rxjs&#x2F;operators&#39;;
+import &#123;AppService&#125; from &#39;..&#x2F;service&#x2F;app.service&#39;;
+&#x2F;**
+ * 全局HTTP请求拦截器
+ *&#x2F;
+@Injectable()
+export class AppHttpInterceptor implements HttpInterceptor &#123;
+  &#x2F;&#x2F; 当前正在通信中的HTTP请求数量，此值是为了在http请求的过程中添加加载动画
+  public processingHttpCount &#x3D; 0;
+  &#x2F;&#x2F; 依赖注入
+  constructor(public appService: AppService) &#123;
+  &#125;
+  intercept(req: HttpRequest&lt;any&gt;, next: HttpHandler): Observable&lt;HttpEvent&lt;any&gt;&gt; &#123;
+    &#x2F;&#x2F; &#x2F;monitor前缀的不做处理
+    if (req.url.includes(&#39;&#x2F;monitor&#39;)) &#123;
+      return next.handle(req);
+    &#125;
+    &#x2F;&#x2F;; setTimeout(() &#x3D;&gt; this.appService.showLoadingBar &#x3D; true);
+    &#x2F;&#x2F; 
+    this.processingHttpCount ++;
+    return next.handle(req.clone(&#123;
+      &#x2F;&#x2F; 为所有拦截的请求添加一个&#39;&#x2F;starry&#39;前缀
+      url: &#39;&#x2F;starry&#39; + (req.url.startsWith(&#39;&#x2F;&#39;) ? req.url : &#39;&#x2F;&#39; + req.url)
+    &#125;))
+      .pipe(
+        debounceTime(1000),
+        &#x2F;&#x2F; 失败时重试2次
+        retry(2),
+        mergeMap((event: any) &#x3D;&gt; &#123;
+          &#x2F;&#x2F; 处理后端HTTP接口返回结果
+          if (event instanceof HttpResponseBase) &#123;
+            &#x2F;&#x2F; HTTP返回代码正常
+            if (event.status &gt;&#x3D; 200 &amp;&amp; event.status &lt; 400) &#123;
+              &#x2F;&#x2F; 处理HTTP Response
+              if (event instanceof HttpResponse) &#123;
+                const body &#x3D; event.body;
+                &#x2F;&#x2F; 判断后端的成功标志字段是否为true
+                if (body &amp;&amp; body.success) &#123;
+                  &#x2F;&#x2F; 取出响应体数据的data部分并继续后续操作(将原有的body替换为了body[&#39;result&#39;])
+                  return of(new HttpResponse(Object.assign(event, &#123;body: body.result&#125;)));
+                &#125; else &#123;
+                  &#x2F;&#x2F; 抛出异常
+                  throw Error(body.message);
+                &#125;
+              &#125;
+            &#125;
+          &#125;
+          &#x2F;&#x2F; 其余事件类型不作拦截处理
+          return of(event);
+        &#125;), catchError((err: HttpErrorResponse) &#x3D;&gt; &#123;
+          &#x2F;&#x2F; 如果发生5xx异常，显示一个错误信息提示
+          this.appService.showSnackBar(err.message, 4000);
+          console.error(err.message)
+          return throwError(err);
+        &#125;), finalize(() &#x3D;&gt; &#123;
+          &#x2F;&#x2F; 最终processingHttpCount减一，并且在减至0的时候移除掉加载动画
+          setTimeout(() &#x3D;&gt; --this.processingHttpCount &#x3D;&#x3D;&#x3D; 0 ?
+            this.appService.showLoadingBar &#x3D; false : this.appService.showLoadingBar &#x3D; true, 500);
+        &#125;));
+  &#125;
+&#125;</code></pre></div>
+<p>&emsp;&emsp;并将此拦截器注册在Angular模块的provider中去，在providers中添加：</p>
+<div class="code-wrapper"><pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript">&#123;
+    provide: HTTP_INTERCEPTORS, useClass: AppHttpInterceptor, multi: true
+&#125;</code></pre></div>
+<p>&emsp;&emsp;这样在调用后端接口的时候我们不用每次再处理后端的返回数据，可直接在返回值中拿到数据体部分去做页面展示，其余的事情就交给拦截器去处理，例如：</p>
+<div class="code-wrapper"><pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript">this.httpClient.get(&#39;&#x2F;config&#x2F;template&#x2F;&#39; + template).subscribe(data &#x3D;&gt; this.configTemplates.push(&#123;template, data&#125;));</code></pre></div>
+<p>&emsp;&emsp;至此，就配置好了一个HTTP拦截器，还可以统一处理请求的URL以及异常处理等等，十分方便。官方文档地址：<a target="_blank" rel="noopener" href="https://angular.io/api/common/http/HttpInterceptor">https://angular.io/api/common/http/HttpInterceptor</a> (中文文档将 <strong>.io</strong> 改为 <strong>.cn</strong> 即可)<br>&emsp;&emsp;除此之外，对于页面路由，Angular其实也提供了类似的工具，可以对路由以及页面组件进行拦截控制，有机会再作介绍。</p>
 
             </div>
             <hr>
@@ -385,9 +358,7 @@ docker-compose --project-directory $DIR up -d</code></pre></div>
                   <div class="post-meta">
                     <i class="iconfont icon-tags"></i>
                     
-                      <a class="hover-with-bg" href="/tags/docker/">docker</a>
-                    
-                      <a class="hover-with-bg" href="/tags/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/">后端开发</a>
+                      <a class="hover-with-bg" href="/tags/%E5%89%8D%E7%AB%AF%E5%BC%80%E5%8F%91/">前端开发</a>
                     
                   </div>
                 
@@ -400,15 +371,21 @@ docker-compose --project-directory $DIR up -d</code></pre></div>
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2020/12/15/Angular%E4%BD%BF%E7%94%A8Http%E6%8B%A6%E6%88%AA%E5%99%A8/">
+                      <a href="/2020/12/15/%E5%8A%A8%E6%80%81%E5%88%9B%E5%BB%BA%E4%B8%8E%E4%BF%AE%E6%94%B9%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Angular使用Http拦截器</span>
+                        <span class="hidden-mobile">动态创建与修改定时任务</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
                   </article>
                   <article class="post-next col-6">
                     
+                    
+                      <a href="/2020/12/14/docker%E5%AE%89%E8%A3%85zookeeper%E9%9B%86%E7%BE%A4-%E9%99%84bash%E8%84%9A%E6%9C%AC/">
+                        <span class="hidden-mobile">docker安装zookeeper集群(附bash脚本)</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
                     
                   </article>
                 </div>

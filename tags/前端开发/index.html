@@ -19,7 +19,7 @@
   <meta name="description" content="">
   <meta name="author" content="Bai JunHan">
   <meta name="keywords" content="">
-  <title>Windlively</title>
+  <title>标签 - 前端开发 - Windlively</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
 
@@ -53,7 +53,7 @@
 
 
 <body>
-  <header style="height: 100vh;">
+  <header style="height: 80vh;">
     <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand"
@@ -135,22 +135,18 @@
 </nav>
 
     <div class="banner intro-2" id="background" parallax=true
-         style="background: url('/assert/image/index_bg.jpg') no-repeat center center;
+         style="background: url('/img/default.png') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="want  to  blow  the  warm  wind  with  you  ~  ~">
+            <span class="h2" id="subtitle" title="标签 - 前端开发">
               
             </span>
 
             
           </div>
 
-          
-            <div class="scroll-down-bar">
-              <i class="iconfont icon-arrowdown"></i>
-            </div>
           
         </div>
       </div>
@@ -161,199 +157,28 @@
     
       <div class="container nopadding-md">
         <div class="py-5" id="board"
-          style=margin-top:0>
+          >
           
           <div class="container">
             <div class="row">
               <div class="col-12 col-md-10 m-auto">
                 
 
-
-  <div class="row mx-auto index-card">
+<div class="list-group">
+  <p class="h4">共计 1 篇文章</p>
+  <hr>
+  
+  
     
+      
+      <p class="h5">2020</p>
     
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2020/12/15/%E5%85%B3%E4%BA%8E%E4%B8%80%E6%AC%A1Kafka%E9%87%8D%E5%A4%8D%E6%B6%88%E8%B4%B9%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5%E8%AE%B0%E5%BD%95%E7%9A%84%E9%97%B2%E8%B0%88/">关于一次Kafka重复消费问题排查记录的闲谈</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/2020/12/15/%E5%85%B3%E4%BA%8E%E4%B8%80%E6%AC%A1Kafka%E9%87%8D%E5%A4%8D%E6%B6%88%E8%B4%B9%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5%E8%AE%B0%E5%BD%95%E7%9A%84%E9%97%B2%E8%B0%88/">
-          
-          
-            
-          
-          &emsp;&emsp;前段时间上线一个新服务，我们的运营在测试的时候，导入了一批数据，结果目标表里的数据是预期数量的2倍，有大量的重复数据，一开始我认为可能是我没有过滤数据类型导致的，我所消费的数据是通过监听数据库的binlog解析后推送到Kafka的数据，我收到kafka消息经过反序列化得到多条数据库表的变动记录，每一条记录都有一个类型：INSERT，UPDATE，DELETE，其实也就是对应
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2020-12-15 01:07" pubdate>
-              2020-12-15
-            </time>
-          </div>
-        
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/kafka/">kafka</a>
-            
-              <a href="/tags/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/">后端开发</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2020/12/15/%E5%8A%A8%E6%80%81%E5%88%9B%E5%BB%BA%E4%B8%8E%E4%BF%AE%E6%94%B9%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/">动态创建与修改定时任务</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/2020/12/15/%E5%8A%A8%E6%80%81%E5%88%9B%E5%BB%BA%E4%B8%8E%E4%BF%AE%E6%94%B9%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/">
-          
-          
-            
-          
-          &emsp;&emsp;最近遇到一个需求，需要能够按照特定的配置执行定时任务，而且定时任务需要在应用不重启的情况下动态增删改，Spring提供的@Scheduled注解是硬编码形式，只能实现固定的定时任务，随后经过一番探究，依托注明的quartz框架终于实现了该功能，下面来分享一下我的方案。
-首先引入quartz maven依赖：
-&lt;dependency&gt;
-    &lt;groupI
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2020-12-15 01:05" pubdate>
-              2020-12-15
-            </time>
-          </div>
-        
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/">后端开发</a>
-            
-              <a href="/tags/Java/">Java</a>
-            
-              <a href="/tags/quartz/">quartz</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2020/12/15/Angular%E4%BD%BF%E7%94%A8Http%E6%8B%A6%E6%88%AA%E5%99%A8/">Angular使用Http拦截器</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/2020/12/15/Angular%E4%BD%BF%E7%94%A8Http%E6%8B%A6%E6%88%AA%E5%99%A8/">
-          
-          
-            
-          
-          &emsp;&emsp;在前端开发的过程中，一般通过HTTP接口与后端进行数据交互，而后端一般会固定一个返回格式，例如：
-&#123;
-    &quot;code&quot;: 0,
-    &quot;success&quot;: true,
-    &quot;message&quot;: &quot;&quot;,
-    &quot;result&quot;:&#123;
-       
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2020-12-15 00:56" pubdate>
-              2020-12-15
-            </time>
-          </div>
-        
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E5%89%8D%E7%AB%AF%E5%BC%80%E5%8F%91/">前端开发</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2020/12/14/docker%E5%AE%89%E8%A3%85zookeeper%E9%9B%86%E7%BE%A4-%E9%99%84bash%E8%84%9A%E6%9C%AC/">docker安装zookeeper集群(附bash脚本)</a>
-      </h1>
-
-      <p class="index-excerpt">
-        <a href="/2020/12/14/docker%E5%AE%89%E8%A3%85zookeeper%E9%9B%86%E7%BE%A4-%E9%99%84bash%E8%84%9A%E6%9C%AC/">
-          
-          
-            
-          
-          
-准备一个文件夹并进入此文件夹， 例如
-mkdir -p ~/docker-app/zookeeper &amp;&amp; cd ~/docker-app/zookeeper
-
-准备三个文件夹并写入zookeeper的myid
-mkdir -p zoo1/data &amp;&amp; echo 1 &gt; zoo1/data/myidmkdir -p zoo2/data &amp;&amp;
-        </a>
-      </p>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2020-12-14 18:27" pubdate>
-              2020-12-14
-            </time>
-          </div>
-        
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/docker/">docker</a>
-            
-              <a href="/tags/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/">后端开发</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
+    <a href="/2020/12/15/Angular%E4%BD%BF%E7%94%A8Http%E6%8B%A6%E6%88%AA%E5%99%A8/" class="list-group-item list-group-item-action">
+      <span class="archive-post-title">Angular使用Http拦截器</span>
+      <time style="float: right;">12-15</time>
+    </a>
+  
+</div>
 
 
 

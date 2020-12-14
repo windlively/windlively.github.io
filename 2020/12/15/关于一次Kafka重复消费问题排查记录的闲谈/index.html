@@ -19,7 +19,7 @@
   <meta name="description" content="">
   <meta name="author" content="Bai JunHan">
   <meta name="keywords" content="">
-  <title>docker安装zookeeper集群(附bash脚本) - Windlively</title>
+  <title>关于一次Kafka重复消费问题排查记录的闲谈 - Windlively</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
 
@@ -166,7 +166,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="docker安装zookeeper集群(附bash脚本)">
+            <span class="h2" id="subtitle" title="关于一次Kafka重复消费问题排查记录的闲谈">
               
             </span>
 
@@ -181,8 +181,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2020-12-14 18:27" pubdate>
-        2020年12月14日 晚上
+      <time datetime="2020-12-15 01:07" pubdate>
+        2020年12月15日 凌晨
       </time>
     </span>
   
@@ -193,7 +193,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      739 字
+      1.8k 字
     </span>
   
 
@@ -203,7 +203,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      12
+      19
        分钟
     </span>
   
@@ -241,7 +241,7 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">docker安装zookeeper集群(附bash脚本)</h1>
+            <h1 style="display: none">关于一次Kafka重复消费问题排查记录的闲谈</h1>
             
               <p class="note note-info">
                 
@@ -250,132 +250,28 @@
               </p>
             
             <div class="markdown-body">
-              <ul>
-<li><p>准备一个文件夹并进入此文件夹， 例如</p>
-<p><code>mkdir -p ~/docker-app/zookeeper &amp;&amp; cd ~/docker-app/zookeeper</code></p>
-</li>
-<li><p>准备三个文件夹并写入zookeeper的myid</p>
-<p><code>mkdir -p zoo1/data &amp;&amp; echo 1 &gt; zoo1/data/myid</code><br><code>mkdir -p zoo2/data &amp;&amp; echo 2 &gt; zoo2/data/myid</code><br><code>mkdir -p zoo3/data &amp;&amp; echo 3 &gt; zoo3/data/myid</code>  </p>
-</li>
-<li><p>创建一个docker-compose.yml文件并编辑  </p>
-<p><code>vim docker-compose.yml</code></p>
-<p>文件内容如下:  </p>
-<div class="code-wrapper"><pre class="line-numbers language-yaml" data-language="yaml"><code class="language-yaml">version: &#39;3.7&#39;
-networks:
-  zk_cluster:
-    name: zk_cluster #为集群创建一个网络
-    driver: bridge
-#集群中的服务(3个节点)
-services:
-  zoo1:
-    image: zookeeper #所使用的镜像
-    restart: always #容器异常时是否重启
-    container_name: zoo1 #容器名称
-    ports: #与宿主机的端口映射
-      - 2181:2181
-      - 8001:8080
-    # zookeeper的配置
-    environment:
-      ZOO_MY_ID: 1
-      ZOO_SERVERS: server.1&#x3D;0.0.0.0:2888:3888;2181 server.2&#x3D;zoo2:2888:3888;2181 server.3&#x3D;zoo3:2888:3888;2181
-    #容器目录映射，此处使用了相对路径
-    volumes:
-      - .&#x2F;zoo1&#x2F;data:&#x2F;data
-      - .&#x2F;zoo1&#x2F;datalog:&#x2F;datalog
-    #所使用的网络
-    networks:
-      - zk_cluster
-  zoo2:
-    image: zookeeper
-    restart: always
-    container_name: zoo2
-    ports:
-      - 2182:2181
-      - 8002:8080
-    environment:
-      ZOO_MY_ID: 2
-      ZOO_SERVERS: server.1&#x3D;zoo1:2888:3888;2181 server.2&#x3D;0.0.0.0:2888:3888;2181 server.3&#x3D;zoo3:2888:3888;2181
-    volumes:
-      - .&#x2F;zoo2&#x2F;data:&#x2F;data
-      - .&#x2F;zoo2&#x2F;datalog:&#x2F;datalog
-    networks:
-      - zk_cluster
-  zoo3:
-    image: zookeeper
-    restart: always
-    container_name: zoo3
-    ports:
-      - 2183:2181
-      - 8003:8080
-    environment:
-      ZOO_MY_ID: 3
-      ZOO_SERVERS: server.1&#x3D;zoo1:2888:3888;2181 server.2&#x3D;zoo2:2888:3888;2181 server.3&#x3D;0.0.0.0:2888:3888;2181
-    volumes:
-      - .&#x2F;zoo3&#x2F;data:&#x2F;data
-      - .&#x2F;zoo3&#x2F;datalog:&#x2F;datalog
-    networks:
-      - zk_cluster</code></pre></div></li>
-<li><p>使用docker-compose命令运行  </p>
-<p><code>docker-compose --project-directory $PWD up -d</code></p>
-</li>
-<li><p>附：一键创建docker zookeeper集群并执行的脚本（该方案仅供参考和学习，生产环境需仔细斟酌，合理修改配置参数）</p>
-<div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">#! &#x2F;bin&#x2F;bash
-
-mkdir -p zookeeper &amp;&amp; cd zookeeper
-DIR&#x3D;$PWD
-echo &quot;cd $DIR&quot;
-echo &quot;create docker compose config file&quot;
-CONF_YML&#x3D;&#39;docker-compose.yml&#39;
-touch $CONF_YML
-echo &quot;version: &#39;3.7&#39;&quot; &gt; $CONF_YML
-NET&#x3D;&#39;zk_cluster&#39;
-echo &#39;networks:&#39; &gt;&gt; $CONF_YML
-echo &quot;  $NET:&quot; &gt;&gt; $CONF_YML
-echo &quot;    name: $NET&quot; &gt;&gt; $CONF_YML
-echo &quot;    driver: bridge&quot; &gt;&gt; $CONF_YML
-#节点个数，可以修改此值创建任意数量的容器节点
-let CLUSTER_COUNT&#x3D;3 
-IMAGE&#x3D;zookeeper
-echo &quot;services:&quot; &gt;&gt; $CONF_YML
-for i in &#96;seq 1 $CLUSTER_COUNT&#96;
-do
-    echo &quot;  zoo$i:&quot; &gt;&gt; $CONF_YML
-    echo &quot;    image: $IMAGE&quot; &gt;&gt; $CONF_YML
-    echo &quot;    restart: always&quot; &gt;&gt; $CONF_YML
-    echo &quot;    container_name: zoo$i&quot; &gt;&gt; $CONF_YML
-    echo &quot;    ports:&quot; &gt;&gt; $CONF_YML
-    echo &quot;      - $[2180 + $i]:2181&quot; &gt;&gt; $CONF_YML
-    echo &quot;      - $[8000 + $i]:8080&quot; &gt;&gt; $CONF_YML
-    echo &quot;    environment:&quot; &gt;&gt; $CONF_YML
-    echo &quot;      ZOO_MY_ID: $i&quot; &gt;&gt; $CONF_YML
-    zk_srv_conf&#x3D;&#39;&#39;
-    for j in &#96;seq 1 $CLUSTER_COUNT&#96;
-    do
-        if test $i !&#x3D; $j;
-        then
-            zk_srv_conf+&#x3D;&quot;server.$j&#x3D;zoo$j:2888:3888;2181&quot;
-        else
-            zk_srv_conf+&#x3D;&quot;server.$j&#x3D;0.0.0.0:2888:3888;2181&quot;
-        fi
-        if test $j !&#x3D; $CLUSTER_COUNT;
-        then
-            zk_srv_conf+&#x3D;&#39; &#39;;
-        fi
-    done
-    echo &quot;      ZOO_SERVERS: $zk_srv_conf&quot; &gt;&gt; $CONF_YML
-    echo &quot;    volumes:&quot; &gt;&gt; $CONF_YML
-    echo &quot;      - .&#x2F;zoo$i&#x2F;data:&#x2F;data&quot; &gt;&gt; $CONF_YML
-    echo &quot;      - .&#x2F;zoo$i&#x2F;datalog:&#x2F;datalog&quot; &gt;&gt; $CONF_YML
-    echo &quot;    networks:&quot; &gt;&gt; $CONF_YML
-    echo &quot;      - $NET&quot; &gt;&gt; $CONF_YML
-    mkdir -p zoo$i&#x2F;data
-    echo $i &gt; zoo$i&#x2F;data&#x2F;myid
-done
-# docker pull zookeeper
-docker-compose --project-directory $DIR up -d</code></pre></div>
-</li>
-</ul>
-
+              <p>&emsp;&emsp;前段时间上线一个新服务，我们的运营在测试的时候，导入了一批数据，结果目标表里的数据是预期数量的2倍，有大量的重复数据，一开始我认为可能是我没有过滤数据类型导致的，我所消费的数据是通过监听数据库的binlog解析后推送到Kafka的数据，我收到kafka消息经过反序列化得到多条数据库表的变动记录，每一条记录都有一个类型：<code>INSERT</code>，<code>UPDATE</code>，<code>DELETE</code>，其实也就是对应SQL的类型，我一开始并没有判断这个类型，而是收到的所有数据都进行后续的处理，运营也说可能是有<code>UPDATE</code>操作的，于是我加了过滤，只处理<code>INSERT</code>类型数据，改好之后想着肯定没问题了，于是让运营再删掉原有数据重新导入一遍，第二天再看结果。   </p>
+<p>&emsp;&emsp;然而第二天，问题依旧……这下可难到我了，想了一会猜测会不会是前面的环节推送的数据就是重复的呢？但是也不能瞎猜，于是我在处理一条数据之前打印上offset，发版后开始观察日志，不一会儿库里出现了重复数据了，我拿到重复的订单号之后去日志中搜索，结果，两条数据的offset是一样的？</p>
+<p><img src="https://oscimg.oschina.net/oscnet/up-a4d97566c877c3ad14dc1ae79d947b9c48e.png" srcset="/img/loading.gif" alt="img"></p>
+<p>&emsp;&emsp;看来这真是我消费的问题了，但是之前类似的项目也是同样的消费方式，从来没出现过重复消费呀，这就让我非常纳闷，于是找了几条重复数据，观察了一下插入时间，发现时间间隔还挺有规律，基本都是五分钟左右重复插入一次，在日志上发现重复消费是两台机器交替进行的，我所消费的Topic是只有一个分区的，所以只会有一台机器消费，从日志上看出来两台机器在交替消费，因而产生了重复消费，但是为什么呢，于是再搜了下<em>Exception</em>关键词，发现了一个<code>CommitFailedException</code>：</p>
+<p><img src="https://oscimg.oschina.net/oscnet/up-4a5809d58553eb75c4d899315e717ef0e9c.png" srcset="/img/loading.gif" alt="img"></p>
+<p>&emsp;&emsp;可以看出来，是当前消费端被踢出了消费组，随后offset提交失败，然后换了一台机器重新消费这个offset，导致了重复消费，但是为什么被被剔除出消费组我仍然无法解释，因为日志上再也没其他错误信息了，好在后来又让我发现了点蛛丝马迹，那会刚好使用了<code>tail -f</code>命令，不经意间发现过了好久，接收到的数据offset都是一样的，一条kafka消息解压后有这么多？(后来在本地试了下，果然一条Kafka消息，反序列化后都有3000到9000条不等，这也太多了吧。。)经过一番Google之后注意到了Kafka的两个配置项：<code>max.poll.interval.ms</code>和<code>max.poll.records</code>分别代表拉取消息的间隔时间和拉取的最大条数，我的配置是：</p>
+<div class="code-wrapper"><pre class="line-numbers language-properties" data-language="properties"><code class="language-properties">max.poll.interval.ms &#x3D; 600000 # 默认5分钟
+max.poll.records &#x3D; 20         # 这个是我最开始写的20条</code></pre></div>
+<p>&emsp;&emsp;也就是说，最快要5分钟内处理完20个offset，否则将认为客户端不在消费了，也就产生了上面的异常，被踢出消费组，而后又commit失败。从打印的日志来看，这个时间明显不够，处理一个offset的消息都要很久，更别说最大20个了。知道原因后，我改了参数:</p>
+<div class="code-wrapper"><pre class="line-numbers language-properties" data-language="properties"><code class="language-properties">max.poll.interval.ms &#x3D; 1200000
+max.poll.records &#x3D; 1</code></pre></div>
+<p>&emsp;&emsp;也就是一条十分钟的一个的下限速度，但是后来证明，这个时间依旧远远不够(最后这个时间已经改为了1个小时…)，经过一段时间的观察，一条Kafka消息反序列化最多会有10000条数据，处理时间最长大约40多分钟，我最开始确实没有想到这个Topic中的一条消息包含的数据会这么多，导致了这一系列的问题，时间改为1小时后连续两天再没出现过重复消费offset的问题。</p>
+<p>&emsp;&emsp;但是但是，这个程序的处理速度慢，也是导致此问题的一个原因，当然后来发现代码中，处理一条数据，平均查询与插入数据库的次数有五六十次！这当然快不起来啊，于是我在大部分的SQL查询部分使用<code>WeakHashMap</code>进行了数据缓存，因为这部分查询的数据基本是不会有变动的，极大的减少了数据库查询次数，处理速度提升了将近10倍！再后来，由于这个Topic只有一个partition，完全没办法用到多台机器的性能，而且据运维反馈，这个TiDB binlog监听的中间件只支持一个分区发送， 于是我自己在程序中增加了一道转发，即消费到Kafka消息反序列化之后，将反序列化之后的数据先不做处理，直接一条一条转发至RocketMQ，这个过程是非常快的，rocketMQ再发送至各个机器上(也可新建一个多partition的Kafka Topic用于转发)，这样就能充分利用集群的优势，进一步极大地提高处理速度，这一块说这么多其实偏题了，属于后续的一个优化。</p>
+<p>&emsp;&emsp;后来发现，其实每一次在消费端即将离开之前，都会有一条日志：</p>
+<p><img src="https://oscimg.oschina.net/oscnet/up-9bd6fbd5b2048752b177b7de8a7211c6c6d.png" srcset="/img/loading.gif" alt="img"></p>
+<p>&emsp;&emsp;提示向服务端发送了离开消费组的请求，因为客户端poll操作已超时，并建议增大最大拉取间隔时间或者减小最大拉取数量(这个不行，我都改到1了 T_T )。  </p>
+<p>&emsp;&emsp;然后在处理完一个offset提交的时候会提示请求失败，当前消费者不再是此消费组的一部分。</p>
+<p><img src="https://oscimg.oschina.net/oscnet/up-ded106931e5c1de8ecefc6f11fca2dbf796.png" srcset="/img/loading.gif" alt="img"></p>
+<p>&emsp;&emsp;但是日志级别是INFO，确实不太容易发现，至此问题已完全解决，原因也完全清楚了。</p>
+<p>&emsp;&emsp;总的来说此次遇到的Kafka重复消费的原因，第一是Kafka的消息太大（后来解析到最大有包含25万条数据的一条消息。。。这都是使用protobuf序列化的消息），但是这部分我们无法变动，第二是一开始处理速度也比较慢，默认间隔时间完全不够，综合导致频繁重新消费。</p>
+<p>&emsp;&emsp;经过此次问题对Kafka参数有了更深的一些认识，除上面两个用到的同时也是比较重要参数之外，还有请求的超时时间、会话超时时间、心跳检测事件、拉取消息的超时时间等，在本地Debug期间还遇到过一个总是拉取不到消息然后报空指针异常的问题，然后查到原因是拉取Kafka消息超时了，一条消息可能有十几兆，那会刚好我电脑的网速非常慢，就超时了，后来加大了<code>fetch.max.wait.ms</code>和<code>request.timeout.ms</code>就没问题了。很有意义的一次Kafka问题排查经历</p>
+<h3 id="附一个：Kafka-Consumer配置官方文档"><a href="#附一个：Kafka-Consumer配置官方文档" class="headerlink" title="附一个：Kafka Consumer配置官方文档"></a>附一个：<a target="_blank" rel="noopener" href="http://kafka.apache.org/090/documentation.html#consumerconfigs">Kafka Consumer配置官方文档</a></h3>
             </div>
             <hr>
             <div>
@@ -385,7 +281,7 @@ docker-compose --project-directory $DIR up -d</code></pre></div>
                   <div class="post-meta">
                     <i class="iconfont icon-tags"></i>
                     
-                      <a class="hover-with-bg" href="/tags/docker/">docker</a>
+                      <a class="hover-with-bg" href="/tags/kafka/">kafka</a>
                     
                       <a class="hover-with-bg" href="/tags/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/">后端开发</a>
                     
@@ -400,15 +296,15 @@ docker-compose --project-directory $DIR up -d</code></pre></div>
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2020/12/15/Angular%E4%BD%BF%E7%94%A8Http%E6%8B%A6%E6%88%AA%E5%99%A8/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Angular使用Http拦截器</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
+                    
+                      <a href="/2020/12/15/%E5%8A%A8%E6%80%81%E5%88%9B%E5%BB%BA%E4%B8%8E%E4%BF%AE%E6%94%B9%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/">
+                        <span class="hidden-mobile">动态创建与修改定时任务</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
                     
                   </article>
                 </div>
