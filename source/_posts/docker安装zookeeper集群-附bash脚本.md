@@ -19,7 +19,7 @@ tags:
 
   文件内容如下:  
 
-  ```yaml
+  ```yml
   version: '3.7'
   networks:
     zk_cluster:
