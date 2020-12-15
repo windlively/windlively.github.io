@@ -350,9 +350,9 @@ footer:
   # 页脚第一行文字的 HTML，建议保留 Fluid 的链接，用于向更多人推广本主题
   # HTML of the first line of the footer, it is recommended to keep the Fluid link to promote this theme to more people
   content: '
-    Power&nbsp;By&nbsp;<a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
-    <i class="iconfont icon-love"></i>
-    <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    Powered&nbsp;By&nbsp;<a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span style="font-weight: bolder">Hexo</span></a>
+    <i class="iconfont icon-love"></i>&nbsp;Theme: 
+    <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span style="font-weight: bolder">Fluid</span></a>
   '
 
   # 展示网站的 PV、UV 统计数
@@ -414,7 +414,7 @@ index:
 
     # 为空则按 hexo config.subtitle 显示
     # If empty, text based on `subtitle` in hexo config
-    text: "want  to  blow  the  warm  wind  with  you  ~  ~"
+    text: "让我再看你一眼，从南到北。"
 
     # 通过 API 接口作为首页副标题的内容，必须返回的是 JSON 格式，如果请求失败则按 text 字段显示，该功能必须先开启 typing 打字机功能
     # Subtitle of the homepage through the API, must be returned a JSON. If the request fails, it will be displayed in `text` value. This feature must first enable the typing animation
@@ -763,7 +763,7 @@ category:
 tag:
   enable: true
   banner_img: /img/default.png
-  banner_img_height: 80
+  banner_img_height: 60
   banner_mask_alpha: 0.3
   subtitle: 
   tagcloud:
@@ -790,8 +790,10 @@ about:
   # 更多图标可从 https://hexo.fluid-dev.com/docs/icon/ 查找，`class` 代表图标的 css class，添加 `qrcode` 后，图标不再是链接而是悬浮二维码
   # More icons can be found from https://hexo.fluid-dev.com/docs/en/icon/  `class` is the css class of the icon. If adding `qrcode`, The icon is no longer a link, but a hovering QR code
   icons:
-    - { class: "iconfont icon-github-fill", link: "https://github.com/windlively", tip: "GitHub" }
-    - { class: "iconfont icon-wechat-fill", qrcode: "/img/favicon.png" }
+    - { class: "iconfont icon-github-fill", link: "https://github.com/windlively", tip: "我的GitHub" }
+    - { class: "iconfont icon-gitee-fill", link: "https://gitee.com/windlively", tip: "我的码云" }
+    - { class: "iconfont icon-mail", link: "mailto:windlively@live.cn", tip: "windlively@live.cn" }
+    # - { class: "iconfont icon-wechat-fill", qrcode: "/img/favicon.png" }
 
 
 #---------------------------
@@ -816,7 +818,7 @@ page404:
   banner_img: /img/default.png
   banner_img_height: 85
   banner_mask_alpha: 0.3
-  subtitle: "Page not found"
+  subtitle: "Ooooh！！你要找的页面失踪了。。。"
 
 
 #---------------------------
@@ -864,55 +866,55 @@ links:
 # DO NOT EDIT THE FOLLOWING SETTINGS UNLESS YOU KNOW WHAT YOU ARE DOING
 #---------------------------
 
-static_prefix:
-  # 内部静态
-  # Internal static
-  internal_js: /js
-  internal_css: /css
-  internal_img: /img
+# static_prefix:
+#   # 内部静态
+#   # Internal static
+#   internal_js: /js
+#   internal_css: /css
+#   internal_img: /img
 
-  # 图标库，包含了大量社交类图标，主题依赖的不包含在内，因此可自行修改，详见 https://hexo.fluid-dev.com/docs/icon/
-  # Icon library, which includes many social icons, does not include those theme dependent, so your can modify link by yourself. See: https://hexo.fluid-dev.com/docs/en/icon/
-  iconfont: //at.alicdn.com/t/font_1736178_kmeydafke9r.css
+#   # 图标库，包含了大量社交类图标，主题依赖的不包含在内，因此可自行修改，详见 https://hexo.fluid-dev.com/docs/icon/
+#   # Icon library, which includes many social icons, does not include those theme dependent, so your can modify link by yourself. See: https://hexo.fluid-dev.com/docs/en/icon/
+#   iconfont: //at.alicdn.com/t/font_1736178_kmeydafke9r.css
 
-  anchor: https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/
+#   anchor: https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/
 
-  github_markdown: https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/
+#   github_markdown: https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/
 
-  jquery: https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/
+#   jquery: https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/
 
-  bootstrap: https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/
+#   bootstrap: https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/
 
-  highlightjs: https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/
+#   highlightjs: https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/
 
-  prismjs: https://cdn.jsdelivr.net/npm/prismjs@1.22.0/
+#   prismjs: https://cdn.jsdelivr.net/npm/prismjs@1.22.0/
 
-  tocbot: https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/
+#   tocbot: https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/
 
-  typed: https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/
+#   typed: https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/
 
-  fancybox: https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/
+#   fancybox: https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/
 
-  nprogress: https://cdn.jsdelivr.net/npm/nprogress@0.2.0/
+#   nprogress: https://cdn.jsdelivr.net/npm/nprogress@0.2.0/
 
-  mathjax: https://cdn.jsdelivr.net/npm/mathjax@3.1.2/es5/
+#   mathjax: https://cdn.jsdelivr.net/npm/mathjax@3.1.2/es5/
 
-  katex: https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/
+#   katex: https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/
 
-  busuanzi: https://busuanzi.ibruce.info/busuanzi/2.3/
+#   busuanzi: https://busuanzi.ibruce.info/busuanzi/2.3/
 
-  clipboard: https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/
+#   clipboard: https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/
 
-  mermaid: https://cdn.jsdelivr.net/npm/mermaid@8.8.3/dist/
+#   mermaid: https://cdn.jsdelivr.net/npm/mermaid@8.8.3/dist/
 
-  valine: https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/
+#   valine: https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/
 
-  waline: https://cdn.jsdelivr.net/npm/@waline/client@0.4.2/dist/
+#   waline: https://cdn.jsdelivr.net/npm/@waline/client@0.4.2/dist/
 
-  gitalk: https://cdn.jsdelivr.net/npm/gitalk@1.7.0/dist/
+#   gitalk: https://cdn.jsdelivr.net/npm/gitalk@1.7.0/dist/
 
-  disqusjs: https://cdn.jsdelivr.net/npm/disqusjs@1.0/dist/
+#   disqusjs: https://cdn.jsdelivr.net/npm/disqusjs@1.0/dist/
 
-  twikoo: https://cdn.jsdelivr.net/npm/twikoo@0.1.15/dist/
+#   twikoo: https://cdn.jsdelivr.net/npm/twikoo@0.1.15/dist/
 
-  hint: /lib/hint/
+#   hint: /lib/hint/
