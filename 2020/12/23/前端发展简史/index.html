@@ -1,0 +1,632 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/assert/favorite.ico">
+  <link rel="icon" type="image/png" href="/assert/favorite.ico">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="Bai JunHan">
+  <meta name="keywords" content="">
+  <title>前端发展简史 - Windlively</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      
+        
+          
+          
+          
+        
+        <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.22.0/themes/prism-solarizedlight.min.css" />
+      
+      
+        <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.22.0/plugins/line-numbers/prism-line-numbers.min.css" />
+      
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+  
+<link rel="stylesheet" href="/assert/css/styles.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.6","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"❡"},"copy_btn":true,"image_zoom":{"enable":true},"lazyload":{"enable":true,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+
+<body>
+  <header style="height: 50vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Windlively</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="前端发展简史">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Bai JunHan
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2020-12-23 21:30" pubdate>
+        2020年12月23日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.1k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      33
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">前端发展简史</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：3 分钟前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="前端技术发展历程"><a href="#前端技术发展历程" class="headerlink" title="前端技术发展历程"></a>前端技术发展历程</h2><h3 id="远古时代："><a href="#远古时代：" class="headerlink" title="远古时代："></a>远古时代：</h3><p>还没有前端这个概念，网页是纯静态页面，HTML伴随着HTTP协议诞生，做一些纯文字信息的展示。</p>
+<h3 id="CSS和JavaScript加入"><a href="#CSS和JavaScript加入" class="headerlink" title="CSS和JavaScript加入"></a>CSS和JavaScript加入</h3><p>早期的页面样式是由<code>&lt;font&gt;&lt;b&gt;&lt;sub&gt;&lt;center&gt;</code>等一系列标签去控制的，但是不利于维护和扩展，所以出现了CSS，将样式控制独立了出来，利于样式的复用。那时候网速也很慢，为了优化交互体验，诞生了JavaScript，此时的JavaScript就是做一些简单的页面逻辑交互，而且原名叫LiveScript，为了蹭Java热度改为了JavaScript……</p>
+<h3 id="JavaScript和ECMAScript？"><a href="#JavaScript和ECMAScript？" class="headerlink" title="JavaScript和ECMAScript？"></a>JavaScript和ECMAScript？</h3><p>JavaScript的开发公司是Netscape，Netscape为了抵抗微软的JScript，将JavaScript提交给ECMA国际标准化组织，希望JavaScript成为国际标准，后来ECMA组织颁布了浏览器脚本语言标准，称之为ECMAScript，因此ECMAScript是一套规范标准，而JavaScript、微软的JScript则是这套标准的实现，大多数场合下ECMAScript和JavaScript的称呼可以通用。</p>
+<h3 id="Dreamweaver、Firework、Flash、FrontPage等拖拽式设计网页的软件"><a href="#Dreamweaver、Firework、Flash、FrontPage等拖拽式设计网页的软件" class="headerlink" title="Dreamweaver、Firework、Flash、FrontPage等拖拽式设计网页的软件"></a>Dreamweaver、Firework、Flash、FrontPage等拖拽式设计网页的软件</h3><ul>
+<li><p>Dreamweaver</p>
+<p>大名鼎鼎的设计软件公司Adobe出品的产品，将网页开发变成了所见即所得，可以使得不懂代码的人经过简单的拖拽操作即可快速生成一套静态网页。Dreamweaver至今仍然在更新，支持的功能也越来越高级了。</p>
+</li>
+</ul>
+<ul>
+<li><p>FrontPage</p>
+<p>微软的网页制作软件，属于Office组件中的一个产品，功能也十分强大，还支持数据库相关操作，于2006年停止更新，后由SharePoint Designer和Expression Web代替</p>
+</li>
+</ul>
+<h3 id="动态网页技术CGI、PHP、JSP等的产生"><a href="#动态网页技术CGI、PHP、JSP等的产生" class="headerlink" title="动态网页技术CGI、PHP、JSP等的产生"></a>动态网页技术CGI、PHP、JSP等的产生</h3><ul>
+<li><p>CGI</p>
+<p>CGI(通用网关接口)是最老的一种技术，其实就是一组接口规范，可以用许多语言( C 、C++ 、VB和Perl等)编写，只要实现其接口即可，当浏览器发起请求，经Web服务器路由后会启动一个进程，调用对应的的CGI程序，程序执行完毕后返回HTML文本至浏览器，展示给用户。由于CGI性能低下，后来衍生出FastCGI，至今仍是一种广泛应用的技术，主流web服务器(Apache、Nginx、Microsoft IIS等)均支持该技术。</p>
+</li>
+<li><p>PHP</p>
+<p>是一种在HTML文本中嵌入服务端代码的脚本语言，可以跨平台运行。由于其简单易上手，功能强大，又是开源技术，曾在Web开发领域风靡一时，和MySQL是好基友。（PHP是世界上最好的语言 yeah~）</p>
+</li>
+<li><p>JSP</p>
+<p>基于Java的动态网页技术，与PHP有些许类似，也是在HTML代码中嵌入Java代码，由服务端编译执行。Java是Web开发领域最主流的技术之一，诞生过许多优秀的Web框架技术，从SSH(Struct、Spring、Hibernate)到SSM(Spring、Spring MVC、MyBatis)，都深受开发者喜爱。如今已经是Spring一家独大，几乎囊括了后端开发的方方面面。相比于PHP技术要求更高一点。</p>
+</li>
+</ul>
+<ul>
+<li><p>ASP</p>
+<p>微软家的动态网页技术，同时支持VBScript和JScript，一般结合.NET框架使用，技术以及功能上来说都挺好，就是收费，财大气粗的公司多数可能会选择它。。。</p>
+</li>
+</ul>
+<ul>
+<li><p>FreeMarker、Thymeleaf等后端模板引擎</p>
+<p>相对于JSP进行优化的页面渲染框架，这两种模板引擎Spring Boot框架都给予了良好的支持。</p>
+</li>
+</ul>
+<h3 id="Ajax技术兴起以及JQuery时代降临"><a href="#Ajax技术兴起以及JQuery时代降临" class="headerlink" title="Ajax技术兴起以及JQuery时代降临"></a>Ajax技术兴起以及JQuery时代降临</h3><ul>
+<li><p>Ajax</p>
+<p>异步的JavaScript和XML(Asynchronous JavaScript and XML)技术，在之前的架构中，客户端向服务器发起请求，服务器处理结束后返回一个新的HTML文本，这样每一次请求都会交互大量数据，而且还要占用服务端资源渲染HTML文档，因此产生了Ajax技术：通过JavaScript代码主动请求服务器，而服务器只返回客户端需要的数据，不再将数据渲染为HTML返回，客户端拿到数据之后，通过DOM操作异步的更新界面，Ajax的优点非常明显：</p>
+<ul>
+<li>极大的减少了网络通信的数据量，比如有时候页面仅需变更一个数字，原先的服务端渲染方式就需要将整个页面全部重新返回，而ajax方式只需要返回这个更新后的数字。</li>
+<li>减轻服务器压力，在大量请求时，仅渲染HTML文档所占用的资源就已经很大了，而客户端JavaScript代码更新页面则不会存在此问题。</li>
+<li>页面是局部刷新的，而不是跟以前一样全部刷新，用户体验更好。</li>
+</ul>
+<p>但是也有一部分缺点：</p>
+<ul>
+<li>用户使用浏览器前进后退时的体验不好，异步刷新的局部更新方式浏览器无法获取历史页面，即丢失了页面的变更历史，但是这一点之后也有开发者想出办法解决。<br>搜索引擎无法SEO。搜索引擎公司的爬虫脚本获取不到网站数据，只能得到一段发送HTTP请求的JS代码，对网站的SEO是一个负面影响，不过Google对此已经有了解决方案，google的搜索引擎已经可以通过执行网页中的JS代码来爬取数据了（黑科技啊！~）</li>
+<li>早期兼容性不好，但是现在已经不是问题了。</li>
+</ul>
+<p>Ajax在JavaScript中是通过XmlHttpRequest对象来支持的，原生的XHR API用起来是比较复杂的，于是便有人对其进行了封装，顺便处理了兼容性，用起来十分方便，比如JQuery。<br>随着Ajax的兴起，JSON这种数据格式也随之慢慢被大家所采用的，凭借比XML的简洁与方便，现在已成为主流的数据交互格式之一。</p>
+</li>
+<li><p>JQuery</p>
+<p>JQuery是之前非常流行的一款前端JS框架，简洁且功能强大，还帮助开发者处理了很多兼容性问题，优化了DOM操作，封装了许多非常好用的API，是当时前端必备的利器，我当时对其也爱不释手，至今仍然还有不少人在用。在此段时期，前后端开发也渐渐出现了分离的迹象。</p>
+</li>
+</ul>
+<h3 id="架在Chrome-V8上的Node"><a href="#架在Chrome-V8上的Node" class="headerlink" title="架在Chrome V8上的Node"></a>架在Chrome V8上的Node</h3><ul>
+<li><p>V8 JavaScript引擎</p>
+<p>V8是由Google研发的一款JavaScript执行引擎，并且谷歌将其开源，V8的特点，就是：快！，非常快，各种优化的奇淫技巧，诞生了这个杰作。所以当年产生了不少调侃Chrome和IE的段子，而由于V8的出现，在服务器上运行JavaScript代码成为了可能。</p>
+</li>
+<li><p>Node.js</p>
+<p>Node凭借着V8引擎的基础，将JavaScript搬到了后台，V8作为Node的运行时，并添加了一些与操作系统交互的API，使其可以脱离浏览器运行，试图将JavaScript应用于后端开发，分一杯服务器开发的羹，并且确实火了一把，虽然最终未能撼动Java的地位，但是他的包管理工具NPM以及依赖管理后续被大家广泛使用，为后来前端项目的工程化奠定了基础，使得前端开发者们有了媲美后端的一系列项目工具（依赖管理、编译、测试、打包、部署、运行）。</p>
+</li>
+</ul>
+<h3 id="JavaScript编译器以及TypeScript等许多新技术"><a href="#JavaScript编译器以及TypeScript等许多新技术" class="headerlink" title="JavaScript编译器以及TypeScript等许多新技术"></a>JavaScript编译器以及TypeScript等许多新技术</h3><ul>
+<li><p>Babel.js</p>
+<p>babel是一个开源的JavaScript编译(转译)器，用于将其他的编程风格转换为JavaScript代码。Babel的出现主要是因为在ES 5、ES 6标准问世之后，各浏览器厂商却未能及时支持，所以出现了此类转译工具，可以将ES 5 + 的语法编译成向后兼容的JavaScript语法，也可自定义语法，提升开发效率，React框架的语法翻译就依赖此库。</p>
+</li>
+<li><p>TypeScript</p>
+<p>TypeScript是JavaScript的超集，由微软推出并开源，它在JavaScript基础之上增添了许多强大的功能支持，最重要的一个特点就是加入了静态类型系统的支持，使其更适合于大型工程项目，并且对于类型的支持比Java之类的语言更加优雅。TypeScript代码通过TypeScript编译期或Babel编译为JavaScript代码执行。</p>
+</li>
+<li><p>服务端推送技术</p>
+<ul>
+<li><p>SSE</p>
+<p>SSE(Server-Sent Events)是服务端向客户端推送数据的一种技术，原先的web模型只能是客户端向服务端发起请求，服务端被动响应，而服务器无法主动向客户端发送数据，所以出现了SSE方案，其实SSE仍然是基于HTTP长连接的一种技术，本质仍然是HTTP协议，其Content-Type为text/event-stream类型，JavaScript代码使用EventSource对象进行处理，发送的文本有固定格式，使用较为简单方便，但是只能服务端向客户端单向发送数据。Spring MVC框架对SSE有不错的支持。</p>
+</li>
+<li><p>WebSocket</p>
+<p>建立在TCP之上的另外一种网络通信协议，支持全双工通信，且效率更高，使用起来比SSE复杂一些，适合需要与服务端进行频繁交互的场景。</p>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>HTML5新特性</p>
+<p>HTML5标准其实诞生时间比较早，由W3C于2014年10月完成标准制定，但是各个浏览器支持进度不一，直至Chrome 67、IE8等现代浏览器问世之后，HTML5标准才被较好的支持。</p>
+<ul>
+<li><p>canvas画布</p>
+<p>支持使用JavaScript代码在页面上绘制复杂图形以及动画。</p>
+</li>
+<li><p>多媒体标签</p>
+<p><code>&lt;audio&gt;&lt;video&gt;</code>等标签的加入，使得开发人员可以更容易的在网页中处理多媒体内容，此前这类复杂内容主要通过Flash、ActiveX等控件处理，而现在HTML原生支持多媒体处理，Flash等技术由于安全性相关问题已经慢慢被遗弃，Chrome浏览器早已默认禁用flash。</p>
+</li>
+<li><p>其他新特性</p>
+<p>本地存储、WEB SQL、<code>&lt;article&gt;&lt;footer&gt;&lt;header&gt;&lt;nav&gt;&lt;section&gt;</code>等新标签，etc…</p>
+</li>
+</ul>
+</li>
+<li><p>CSS新特性</p>
+<p>CSS陆续加入了许多强大和有趣的功能，使得UI可以越来越漂亮，这也得益于客户端浏览器性能越来越强悍：</p>
+<ul>
+<li>适合移动设备的flex布局</li>
+<li>MediaQuery加入，支持响应式布局</li>
+<li>Grid布局</li>
+<li>CSS滤镜</li>
+<li>CSS背景虚化</li>
+<li>CSS动画</li>
+<li>……</li>
+</ul>
+</li>
+</ul>
+<h3 id="React-js、Angular、Vue-js等框架陆续登场"><a href="#React-js、Angular、Vue-js等框架陆续登场" class="headerlink" title="React.js、Angular、Vue.js等框架陆续登场"></a>React.js、Angular、Vue.js等框架陆续登场</h3><p>随着前后端分离的web开发方案以及SPA(单页面应用)的概念越来越流行，前端框架也开始层出不穷，将原先属于后端的MVC模型利用JS搬到了前端，又形成了MVVM、MVP等模型概念，其中以React、Angular、Vue最为出名和流行，彻底将前端开发从后端开发中剥离出来，使得前端开发更为纯粹，专注于页面视图开发，曾风光无限的JQuery一类的js库开始慢慢淡出历史舞台，得益于框架提供的强大功能，我们不再需要手动操纵DOM文档。框架技术在此时的发展十分迅速，甚至开始向原生APP开发领域挺进，而基于这些框架技术开发的网站，又可被称之为Web App，网站已经从原先的信息展示变成了一些功能性应用。Android、Windows都有将JS开发的应用转换为对应平台APP的技术，至此，JavaScript已经做到了”Any application that can be written in JavaScript, will eventually be written in JavaScript”！</p>
+<h3 id="大前端时代，百花齐放的WebApp框架"><a href="#大前端时代，百花齐放的WebApp框架" class="headerlink" title="大前端时代，百花齐放的WebApp框架"></a>大前端时代，百花齐放的WebApp框架</h3><p>此时的前端又被许多人称之为”大前端”，JavaScript早已不再局限于传统网站的开发，Electron、React Native、微信小程序、支付宝小程序等等，都在尝试基于浏览器的跨平台APP技术，也都取得了不错的效果，JavaScript从早期一个无数人吐槽的脚本语言进化到现在成为了前端开发的核心。<br>到今天，人们还不满足于此，前端技术仍在高速发展，以Google为代表的众多行业领头羊继续在探索未来的前端方向，例如浏览器已经开始支持的WebAssembly技术和Google的Flutter跨平台原生APP开发框架。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%89%8D%E7%AB%AF%E5%BC%80%E5%8F%91/">前端开发</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2020/12/15/docker%E5%AE%89%E8%A3%85mongo/">
+                        <span class="hidden-mobile">docker安装mongo</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div id="vcomments"></div>
+  <script type="text/javascript">
+    Fluid.utils.waitElementVisible('vcomments', function() {
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', function () {
+        new Valine({
+          el: "#vcomments",
+          app_id: "QkswS3xEGrTbK0dmA0NX2KTV-gzGzoHsz",
+          app_key: "uiXDBJGFOOhknLymw8GW28MN",
+          placeholder: "说点什么",
+          path: window.location.pathname,
+          avatar: "retro",
+          meta: ["nick","mail","link"],
+          pageSize: "10",
+          lang: "zh-CN",
+          highlight: false,
+          recordIP: false,
+          serverURLs: "",
+        });
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the
+    <a target="_blank" href="https://valine.js.org" rel="nofollow noopener noopener">comments powered by Valine.</a>
+  </noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     Powered&nbsp;By&nbsp;<a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span style="font-weight: bolder">Hexo</span></a> <i class="iconfont icon-love"></i>&nbsp;Theme:  <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span style="font-weight: bolder">Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":200})
+    NProgress.start()
+    document.addEventListener('DOMContentLoaded', function() {
+      window.NProgress && window.NProgress.inc();
+    })
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  
+    
+      <script  src="https://cdn.jsdelivr.net/npm/prismjs@1.22.0/components/prism-core.min.js" ></script>
+      <script  src="https://cdn.jsdelivr.net/npm/prismjs@1.22.0/plugins/autoloader/prism-autoloader.min.js" ></script>
+      
+        <script  src="https://cdn.jsdelivr.net/npm/prismjs@1.22.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
+      
+    
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+
+</body>
+</html>
