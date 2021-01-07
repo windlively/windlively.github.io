@@ -19,7 +19,7 @@
   <meta name="description" content="">
   <meta name="author" content="Bai JunHan">
   <meta name="keywords" content="">
-  <title>Angular使用Http拦截器 - Windlively</title>
+  <title>jar包执行时访问资源文件造成的FileSystemNotFoundException问题 - Windlively</title>
 
   <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
 
@@ -166,7 +166,7 @@
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
           <div class="page-header text-center fade-in-up">
-            <span class="h2" id="subtitle" title="Angular使用Http拦截器">
+            <span class="h2" id="subtitle" title="jar包执行时访问资源文件造成的FileSystemNotFoundException问题">
               
             </span>
 
@@ -181,8 +181,8 @@
   
     <span class="post-meta">
       <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-      <time datetime="2020-12-15 00:56" pubdate>
-        2020年12月15日 凌晨
+      <time datetime="2021-01-07 22:36" pubdate>
+        2021年1月7日 晚上
       </time>
     </span>
   
@@ -193,7 +193,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1k 字
+      1.2k 字
     </span>
   
 
@@ -203,7 +203,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      14
+      19
        分钟
     </span>
   
@@ -241,113 +241,104 @@
         <div class="py-5" id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">Angular使用Http拦截器</h1>
+            <h1 style="display: none">jar包执行时访问资源文件造成的FileSystemNotFoundException问题</h1>
             
               <p class="note note-info">
                 
-                  本文最后更新于：24 天前
+                  本文最后更新于：1 分钟前
                 
               </p>
             
             <div class="markdown-body">
-              <p>&emsp;&emsp;在前端开发的过程中，一般通过HTTP接口与后端进行数据交互，而后端一般会固定一个返回格式，例如：</p>
-<div class="code-wrapper"><pre class="line-numbers language-json" data-language="json"><code class="language-json">&#123;
-    &quot;code&quot;: 0,
-    &quot;success&quot;: true,
-    &quot;message&quot;: &quot;&quot;,
-    &quot;result&quot;:&#123;
-        &quot;id&quot;:9,
-        &quot;title&quot;:&quot;&quot;,
-        &quot;content&quot;:&quot;&quot;,
-        &quot;createTime&quot;:&quot;2020-11-25 19:22:31&quot;,
-        &quot;updateTime&quot;:&quot;2020-11-25 19:47:22&quot;,
-        &quot;available&quot;:true
-    &#125;
-&#125;</code></pre></div>
-<p>&emsp;&emsp;前端在拿到数据后，首先判断是否成功，然后取出数据体显示到页面上，但是每一次都这么去做，几乎都是重复的操作，在后端开发的过程中，有诸如过滤器、Spring提供的拦截器等工具实现对HTTP请求的统一处理，在前端其实也有类似的东西，Angular框架就提供了拦截器接口:</p>
-<div class="code-wrapper"><pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript">interface HttpInterceptor &#123;
-  intercept(req: HttpRequest&lt;any&gt;, next: HttpHandler): Observable&lt;HttpEvent&lt;any&gt;&gt;
-&#125;</code></pre></div>
-<p>&emsp;&emsp;可以实现统一的HTTP请求处理，帮助我们简化代码，并且方便代码的维护，直接放上一个我实际使用过的示例代码：</p>
-<div class="code-wrapper"><pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript">import &#123;
-  HttpErrorResponse,
-  HttpEvent,
-  HttpHandler,
-  HttpInterceptor,
-  HttpRequest,
-  HttpResponse,
-  HttpResponseBase
-&#125; from &#39;@angular&#x2F;common&#x2F;http&#39;;
-import &#123;Observable, of, throwError&#125; from &#39;rxjs&#39;;
-import &#123;Injectable&#125; from &#39;@angular&#x2F;core&#39;;
-import &#123;catchError, debounceTime, finalize, mergeMap, retry&#125; from &#39;rxjs&#x2F;operators&#39;;
-import &#123;AppService&#125; from &#39;..&#x2F;service&#x2F;app.service&#39;;
-&#x2F;**
- * 全局HTTP请求拦截器
- *&#x2F;
-@Injectable()
-export class AppHttpInterceptor implements HttpInterceptor &#123;
-  &#x2F;&#x2F; 当前正在通信中的HTTP请求数量，此值是为了在http请求的过程中添加加载动画
-  public processingHttpCount &#x3D; 0;
-  &#x2F;&#x2F; 依赖注入
-  constructor(public appService: AppService) &#123;
-  &#125;
-  intercept(req: HttpRequest&lt;any&gt;, next: HttpHandler): Observable&lt;HttpEvent&lt;any&gt;&gt; &#123;
-    &#x2F;&#x2F; &#x2F;monitor前缀的不做处理
-    if (req.url.includes(&#39;&#x2F;monitor&#39;)) &#123;
-      return next.handle(req);
-    &#125;
-    &#x2F;&#x2F;; setTimeout(() &#x3D;&gt; this.appService.showLoadingBar &#x3D; true);
-    &#x2F;&#x2F; 
-    this.processingHttpCount ++;
-    return next.handle(req.clone(&#123;
-      &#x2F;&#x2F; 为所有拦截的请求添加一个&#39;&#x2F;starry&#39;前缀
-      url: &#39;&#x2F;starry&#39; + (req.url.startsWith(&#39;&#x2F;&#39;) ? req.url : &#39;&#x2F;&#39; + req.url)
-    &#125;))
-      .pipe(
-        debounceTime(1000),
-        &#x2F;&#x2F; 失败时重试2次
-        retry(2),
-        mergeMap((event: any) &#x3D;&gt; &#123;
-          &#x2F;&#x2F; 处理后端HTTP接口返回结果
-          if (event instanceof HttpResponseBase) &#123;
-            &#x2F;&#x2F; HTTP返回代码正常
-            if (event.status &gt;&#x3D; 200 &amp;&amp; event.status &lt; 400) &#123;
-              &#x2F;&#x2F; 处理HTTP Response
-              if (event instanceof HttpResponse) &#123;
-                const body &#x3D; event.body;
-                &#x2F;&#x2F; 判断后端的成功标志字段是否为true
-                if (body &amp;&amp; body.success) &#123;
-                  &#x2F;&#x2F; 取出响应体数据的data部分并继续后续操作(将原有的body替换为了body[&#39;result&#39;])
-                  return of(new HttpResponse(Object.assign(event, &#123;body: body.result&#125;)));
-                &#125; else &#123;
-                  &#x2F;&#x2F; 抛出异常
-                  throw Error(body.message);
+              <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>在Java项目中，若需要访问资源文件，通常使用<code>getClass().getResource(&quot;/xxx&quot;)</code>和<code>getClass().getResourceAsStream(&quot;/&quot;)</code>来获取资源文件，后一种方式获取到的是InputStream，一般不会出现什么问题，但是通过第一种获取资源URL的方式，在IDEA中执行时没有问题，但是在服务器环境执行时，会出现<code>java.nio.file.FileSystemNotFoundException</code>，之前遇到这个问题我没有在意，只是换成<code>getResourceAsStream</code>后就解决了，但是后来遇到一个需要递归访问资源文件目录，我使用的<code>Files.walkFileTree</code>方法，直接获取输入流的方案不适合我，随后发现其实只要是打成jar包执行的时候，通过<code>Files</code>和<code>Path</code>去访问资源文件，<code>getResource</code>就会抛出<code>FileSystemNotFoundException</code>，并非服务器环境的问题，因为jar包执行时，文件系统与IDE中直接执行时不一样，所以会抛出这个异常。<br>原始的代码如下：</p>
+<div class="code-wrapper"><pre class="line-numbers language-java" data-language="java"><code class="language-java">Path configDir &#x3D; Paths.get(
+                    LocalConfigDataFlowManager.class.getResource(
+                            &quot;&#x2F;&quot;
+                    ).toURI().getPath(), &quot;flow-config&quot;
+            );
+List&lt;Map&lt;String, Object&gt;&gt; config &#x3D; new ArrayList&lt;&gt;();
+Files.walkFileTree(
+        configDir,
+        new HashSet&lt;&gt;(),
+        1,
+        new FileVisitor&lt;Path&gt;() &#123;
+        ......</code></pre></div>
+<p>报错信息如下：</p>
+<div class="code-wrapper"><pre class="line-numbers language-log" data-language="log"><code class="language-log">java.nio.file.FileSystemNotFoundException
+        at jdk.zipfs&#x2F;jdk.nio.zipfs.ZipFileSystemProvider.getFileSystem(ZipFileSystemProvider.java:169)
+        at jdk.zipfs&#x2F;jdk.nio.zipfs.ZipFileSystemProvider.getPath(ZipFileSystemProvider.java:155)
+        at java.base&#x2F;java.nio.file.Path.of(Path.java:208)
+        at java.base&#x2F;java.nio.file.Paths.get(Paths.java:97)
+        at ink.andromeda.dataflow.core.flow.ConfigurableDataFlowManager.&lt;init&gt;(ConfigurableDataFlowManager.java:305)
+        at ink.andromeda.dataflow.demo.LocalConfigDataFlowManager.&lt;init&gt;(LocalConfigDataFlowManager.java:25)
+        at ink.andromeda.dataflow.demo.DataFlowDemoApplication.dataFlowManager(DataFlowDemoApplication.java:51)
+        at ink.andromeda.dataflow.demo.DataFlowDemoApplication$$EnhancerBySpringCGLIB$$73b01d37.CGLIB$dataFlowManager$0(&lt;generated&gt;)
+        ......
+......
+2021-01-07.22:34:39.649 ERROR TraceId[] [main] i.a.d.d.LocalConfigDataFlowManager.visitFileFailed:60 null&#x2F;flow-config
+java.nio.file.NoSuchFileException: null&#x2F;flow-config
+        at java.base&#x2F;sun.nio.fs.UnixException.translateToIOException(UnixException.java:92)
+        at java.base&#x2F;sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:111)
+        at java.base&#x2F;sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:116)
+        at java.base&#x2F;sun.nio.fs.UnixFileAttributeViews$Basic.readAttributes(UnixFileAttributeViews.java:55)
+        at java.base&#x2F;sun.nio.fs.UnixFileSystemProvider.readAttributes(UnixFileSystemProvider.java:149)
+        at java.base&#x2F;java.nio.file.Files.readAttributes(Files.java:1763)
+        at java.base&#x2F;java.nio.file.FileTreeWalker.getAttributes(FileTreeWalker.java:219)
+        at java.base&#x2F;java.nio.file.FileTreeWalker.visit(FileTreeWalker.java:276)
+        at java.base&#x2F;java.nio.file.FileTreeWalker.walk(FileTreeWalker.java:322)
+        at java.base&#x2F;java.nio.file.Files.walkFileTree(Files.java:2716)
+        at ink.andromeda.dataflow.demo.LocalConfigDataFlowManager.getFlowConfig(LocalConfigDataFlowManager.java:39)
+        at ink.andromeda.dataflow.core.flow.ConfigurableDataFlowManager.reload(ConfigurableDataFlowManager.java:92)
+        at ink.andromeda.dataflow.core.flow.ConfigurableDataFlowManager.init(ConfigurableDataFlowManager.java:56)
+        at java.base&#x2F;jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        at java.base&#x2F;jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+        at java.base&#x2F;jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+        at java.base&#x2F;java.lang.reflect.Method.invoke(Method.java:566)
+        ......</code></pre></div>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>刚开始试了如下方案：</p>
+<div class="code-wrapper"><pre class="line-numbers language-java" data-language="java"><code class="language-java">Path configDir &#x3D; FileSystems.getDefault().getPath(new UrlResource(this.getClass().getResource(&quot;&#x2F;flow-config&quot;).toURI()).toString());</code></pre></div>
+<p>但是仍然有问题：</p>
+<div class="code-wrapper"><pre class="line-numbers language-log" data-language="log"><code class="language-log">2021-01-07.23:06:42.037 ERROR TraceId[] [main] i.a.d.d.LocalConfigDataFlowManager.visitFileFailed:63 URL [jar:file:&#x2F;Users&#x2F;windlively&#x2F;IdeaProjects&#x2F;data-flow&#x2F;data-flow-demo&#x2F;target&#x2F;data-flow-demo-1.0-SNAPSHOT.jar!&#x2F;BOOT-INF&#x2F;classes!&#x2F;flow-config]
+java.nio.file.NoSuchFileException: URL [jar:file:&#x2F;Users&#x2F;windlively&#x2F;IdeaProjects&#x2F;data-flow&#x2F;data-flow-demo&#x2F;target&#x2F;data-flow-demo-1.0-SNAPSHOT.jar!&#x2F;BOOT-INF&#x2F;classes!&#x2F;flow-config]
+        at java.base&#x2F;sun.nio.fs.UnixException.translateToIOException(UnixException.java:92)
+        at java.base&#x2F;sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:111)
+        at java.base&#x2F;sun.nio.fs.UnixException.rethrowAsIOException(UnixException.java:116)
+        at java.base&#x2F;sun.nio.fs.UnixFileAttributeViews$Basic.readAttributes(UnixFileAttributeViews.java:55)
+        at java.base&#x2F;sun.nio.fs.UnixFileSystemProvider.readAttributes(UnixFileSystemProvider.java:149)
+        at java.base&#x2F;java.nio.file.Files.readAttributes(Files.java:1763)
+        at java.base&#x2F;java.nio.file.FileTreeWalker.getAttributes(FileTreeWalker.java:219)
+        at java.base&#x2F;java.nio.file.FileTreeWalker.visit(FileTreeWalker.java:276)
+        at java.base&#x2F;java.nio.file.FileTreeWalker.walk(FileTreeWalker.java:322)
+        at java.base&#x2F;java.nio.file.Files.walkFileTree(Files.java:2716)
+        at ink.andromeda.dataflow.demo.LocalConfigDataFlowManager.getFlowConfig(LocalConfigDataFlowManager.java:42)
+        at ink.andromeda.dataflow.core.flow.ConfigurableDataFlowManager.reload(ConfigurableDataFlowManager.java:92)
+        at ink.andromeda.dataflow.core.flow.ConfigurableDataFlowManager.init(ConfigurableDataFlowManager.java:56)</code></pre></div>
+<p>于是继续查询资料，在stackoverflow上看到了一个利用Spring的<code>@Value()</code>注解和Spring Resource来访问资源文件的替代方案，而且提供了遍历资源文件夹的方法。<br>首先在Bean中加入一个字段并用Value注解注入资源文件的位置：</p>
+<div class="code-wrapper"><pre class="line-numbers language-java" data-language="java"><code class="language-java">@Value(&quot;classpath:&#x2F;flow-config&#x2F;**&quot;)
+private Resource[] flowConfigResources;</code></pre></div>
+<p>Spring会自动将classes根目录<code>flow-config</code>文件夹下的资源文件全部注入到<code>flowConfigResources</code>字段中去。<br>然后修改原先的代码如下：</p>
+<div class="code-wrapper"><pre class="line-numbers language-java" data-language="java"><code class="language-java">protected List&lt;Map&lt;String, Object&gt;&gt; getFlowConfig() &#123;
+    return Stream.of(flowConfigResources)
+            .filter(s -&gt; Objects.nonNull(s.getFilename()))
+            .filter(s -&gt; s.getFilename().matches(&quot;^sync-config-[\\w-]+?.json$&quot;))
+            .map(flowConfigResource -&gt; &#123;
+                try (InputStream is &#x3D; flowConfigResource.getInputStream()) &#123;
+                    ByteArrayOutputStream os &#x3D; new ByteArrayOutputStream();
+                    int data;
+                    while ((data &#x3D; is.read()) !&#x3D; -1) os.write(data);
+                    &#x2F;&#x2F;noinspection unchecked
+                    return (Map&lt;String, Object&gt;) GSON().fromJson(os.toString(StandardCharsets.UTF_8.name()),
+                            new TypeToken&lt;Map&lt;String, Object&gt;&gt;() &#123;
+                            &#125;.getType());
+
+                &#125; catch (IOException ex) &#123;
+                    throw new IllegalStateException(ex);
                 &#125;
-              &#125;
-            &#125;
-          &#125;
-          &#x2F;&#x2F; 其余事件类型不作拦截处理
-          return of(event);
-        &#125;), catchError((err: HttpErrorResponse) &#x3D;&gt; &#123;
-          &#x2F;&#x2F; 如果发生5xx异常，显示一个错误信息提示
-          this.appService.showSnackBar(err.message, 4000);
-          console.error(err.message)
-          return throwError(err);
-        &#125;), finalize(() &#x3D;&gt; &#123;
-          &#x2F;&#x2F; 最终processingHttpCount减一，并且在减至0的时候移除掉加载动画
-          setTimeout(() &#x3D;&gt; --this.processingHttpCount &#x3D;&#x3D;&#x3D; 0 ?
-            this.appService.showLoadingBar &#x3D; false : this.appService.showLoadingBar &#x3D; true, 500);
-        &#125;));
-  &#125;
+            &#125;)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
 &#125;</code></pre></div>
-<p>&emsp;&emsp;并将此拦截器注册在Angular模块的provider中去，在providers中添加：</p>
-<div class="code-wrapper"><pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript">&#123;
-    provide: HTTP_INTERCEPTORS, useClass: AppHttpInterceptor, multi: true
-&#125;</code></pre></div>
-<p>&emsp;&emsp;这样在调用后端接口的时候我们不用每次再处理后端的返回数据，可直接在返回值中拿到数据体部分去做页面展示，其余的事情就交给拦截器去处理，例如：</p>
-<div class="code-wrapper"><pre class="line-numbers language-typescript" data-language="typescript"><code class="language-typescript">this.httpClient.get(&#39;&#x2F;config&#x2F;template&#x2F;&#39; + template).subscribe(data &#x3D;&gt; this.configTemplates.push(&#123;template, data&#125;));</code></pre></div>
-<p>&emsp;&emsp;至此，就配置好了一个HTTP拦截器，还可以统一处理请求的URL以及异常处理等等，十分方便。官方文档地址：<a target="_blank" rel="noopener" href="https://angular.io/api/common/http/HttpInterceptor">https://angular.io/api/common/http/HttpInterceptor</a> (中文文档将 <strong>.io</strong> 改为 <strong>.cn</strong> 即可)<br>&emsp;&emsp;除此之外，对于页面路由，Angular其实也提供了类似的工具，可以对路由以及页面组件进行拦截控制，有机会再作介绍。</p>
+<p>过滤和遍历Spring注入的Resource列表，即可读取到此文件夹下所有需要的资源文件，打成jar包之后也可正常运行。</p>
 
             </div>
             <hr>
@@ -358,7 +349,11 @@ export class AppHttpInterceptor implements HttpInterceptor &#123;
                   <div class="post-meta">
                     <i class="iconfont icon-tags"></i>
                     
-                      <a class="hover-with-bg" href="/tags/%E5%89%8D%E7%AB%AF%E5%BC%80%E5%8F%91/">前端开发</a>
+                      <a class="hover-with-bg" href="/tags/%E5%90%8E%E7%AB%AF%E5%BC%80%E5%8F%91/">后端开发</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Java/">Java</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/">踩坑记录</a>
                     
                   </div>
                 
@@ -371,18 +366,12 @@ export class AppHttpInterceptor implements HttpInterceptor &#123;
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2020/12/15/%E5%8A%A8%E6%80%81%E5%88%9B%E5%BB%BA%E4%B8%8E%E4%BF%AE%E6%94%B9%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">动态创建与修改定时任务</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2020/12/14/docker%E5%AE%89%E8%A3%85zookeeper%E9%9B%86%E7%BE%A4-%E9%99%84bash%E8%84%9A%E6%9C%AC/">
-                        <span class="hidden-mobile">docker安装zookeeper集群(附bash脚本)</span>
+                      <a href="/2020/12/23/%E5%89%8D%E7%AB%AF%E5%8F%91%E5%B1%95%E7%AE%80%E5%8F%B2/">
+                        <span class="hidden-mobile">前端发展简史</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
