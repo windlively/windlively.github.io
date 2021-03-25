@@ -293,7 +293,7 @@ navbar:
   menu:
     - { key: "home", link: "/", icon: "iconfont icon-home-fill" }
     - { key: "archive", link: "/archives/", icon: "iconfont icon-archive-fill" }
-    # - { key: "category", link: "/categories/", icon: "iconfont icon-category-fill" }
+    - { key: "category", link: "/categories/", icon: "iconfont icon-category-fill" }
     - { key: "tag", link: "/tags/", icon: "iconfont icon-tags-fill" }
     - { key: "about", link: "/about/", icon: "iconfont icon-user-fill" }
     #- { key: "links", link: "/links/", icon: "iconfont icon-link-fill" }
@@ -736,11 +736,11 @@ archive:
 # Category Page
 #---------------------------
 category:
-  enable: false
+  enable: true
   banner_img: /img/default.png
   banner_img_height: 60
   banner_mask_alpha: 0.3
-  subtitle:
+  subtitle: 
 
   # 单个分类中折叠展示文章数的最大值，超过限制会显示 More
   # The maximum number of posts in a single category. If the limit is exceeded, it will be displayed More
