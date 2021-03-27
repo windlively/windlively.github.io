@@ -287,11 +287,11 @@ def buildTransSQL(task: UpdateTask): Seq[String] = {
 
 关联关系
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/e7ae7ddd-2260-4fd9-90c2-35ed1c0007f8/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAT73L2G45O3KS52Y5%2F20210325%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20210325T082019Z&X-Amz-Expires=86400&X-Amz-Signature=a37c8d5058369cddb8c95cd4f638ce1ff6b29817c8a7708125961a13374dabfb&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22Untitled.png%22)
+![](https://oscimg.oschina.net/oscnet/up-ad374c7f0532171add44d6e2141ace62855.png)
 
 计算逻辑
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/6196aa4e-cb9b-4931-98fd-04faa15b6cf4/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAT73L2G45O3KS52Y5%2F20210325%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20210325T082102Z&X-Amz-Expires=86400&X-Amz-Signature=176bb87feef89e1478e756185f82360b7c8ac4514796791c40b1f6bf708cac13&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22Untitled.png%22)
+![](https://oscimg.oschina.net/oscnet/up-2767f6831520f8f011fed2511a43ca13c44.png)
 
 抽象出的关联关系应为：
 
@@ -442,7 +442,7 @@ where
 
 ### 同步结果
 
-![](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/872022cc-873c-49f8-8bdf-a67ed676fe80/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAT73L2G45O3KS52Y5%2F20210325%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20210325T082144Z&X-Amz-Expires=86400&X-Amz-Signature=09373fe9da20bbb3224b91cc4ba49ed1999ad5188de5492cb551274139d7c732&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22Untitled.png%22)
+![](https://oscimg.oschina.net/oscnet/up-0b722f692e6727e053b48e3a97e6eac2c9d.png)
 
 从Spark后台日志中可以看到，数据已经正常插入目标表。
 

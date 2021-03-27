@@ -67,7 +67,7 @@ tags:
 
 4. 打开浏览器，访问[http://localhost:8089](http://localhost:8089)，默认账号密码为admin/123456，首页如图所示
 
-    ![canal%E5%9C%A8docker%E4%B8%8B%E7%9A%84%E6%90%AD%E5%BB%BA(canal-admin)%200c96ef4825d44603b2ea38472f28a3c7/Untitled.png](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/bc5576e9-25e8-49f3-a581-c8467296d3f3/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAT73L2G45O3KS52Y5%2F20210307%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20210307T093714Z&X-Amz-Expires=86400&X-Amz-Signature=b6de03b0f33baf84efc117d35a4175d31311f064cc4a7292cb09d04e7cdcc4aa&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22Untitled.png%22)
+    ![](https://oscimg.oschina.net/oscnet/up-9fe870724e9ad4581f18e9a4be241c1fcaf.png)
 
 5. 下载canal-server的运行脚本
 
@@ -97,7 +97,7 @@ tags:
 
 7. 启动成功后，刷新admin页面的server列表，会出现刚刚启动的canal-server：
 
-    ![canal%E5%9C%A8docker%E4%B8%8B%E7%9A%84%E6%90%AD%E5%BB%BA(canal-admin)%200c96ef4825d44603b2ea38472f28a3c7/Untitled%201.png](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/7b6ebad2-eee0-4028-ad27-bbb2961a6e96/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAT73L2G45O3KS52Y5%2F20210307%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20210307T093741Z&X-Amz-Expires=86400&X-Amz-Signature=424185044b482bb3bc933fbb40d4bce6cfb51c309cd96a6d3376d2d9d01cdba9&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22Untitled.png%22)
+    ![](https://oscimg.oschina.net/oscnet/up-4aadd69d740610d80bfaf9c01b2047db717.png)
 
     至此，canal的创建与启动已经完成，在管理页面进行配置操作即可
 
@@ -184,7 +184,7 @@ canal.mq.partition=0
 
 手动修改一条该表的数据，即可收到canal发送的数据库变更消息：
 
-![canal%E5%9C%A8docker%E4%B8%8B%E7%9A%84%E6%90%AD%E5%BB%BA(canal-admin)%200c96ef4825d44603b2ea38472f28a3c7/Untitled%202.png](https://s3.us-west-2.amazonaws.com/secure.notion-static.com/cda00192-7e5f-484c-8ab4-687ba07552dc/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAT73L2G45O3KS52Y5%2F20210307%2Fus-west-2%2Fs3%2Faws4_request&X-Amz-Date=20210307T093806Z&X-Amz-Expires=86400&X-Amz-Signature=c4e2f93c9c8483766758c32baca12437bae8782fd949673f9c3f463ab716e5b6&X-Amz-SignedHeaders=host&response-content-disposition=filename%20%3D%22Untitled.png%22)
+![](https://oscimg.oschina.net/oscnet/up-efdcbe72ea74b2357c99b31786999aaf840.png)
 
 ## 总结：
 
