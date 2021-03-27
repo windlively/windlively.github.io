@@ -124,6 +124,18 @@
           
           
             <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
               <a class="nav-link" href="/tags/">
                 <i class="iconfont icon-tags-fill"></i>
                 标签
@@ -245,7 +257,7 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2 分钟前
+                  本文最后更新于：4 分钟前
                 
               </p>
             
@@ -296,7 +308,7 @@ sh run_admin.sh \
     -e spring.datasource.password&#x3D;xxx</code></pre></div>
 </li>
 <li><p>打开浏览器，访问<a target="_blank" rel="noopener" href="http://localhost:8089/">http://localhost:8089</a>，默认账号密码为admin/123456，首页如图所示</p>
-<p> <img src="https://s3.us-west-2.amazonaws.com/secure.notion-static.com/bc5576e9-25e8-49f3-a581-c8467296d3f3/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAT73L2G45O3KS52Y5/20210307/us-west-2/s3/aws4_request&X-Amz-Date=20210307T093714Z&X-Amz-Expires=86400&X-Amz-Signature=b6de03b0f33baf84efc117d35a4175d31311f064cc4a7292cb09d04e7cdcc4aa&X-Amz-SignedHeaders=host&response-content-disposition=filename%20=%22Untitled.png%22" srcset="/img/loading.gif" alt="canal%E5%9C%A8docker%E4%B8%8B%E7%9A%84%E6%90%AD%E5%BB%BA(canal-admin)%200c96ef4825d44603b2ea38472f28a3c7/Untitled.png"></p>
+<p> <img src="https://oscimg.oschina.net/oscnet/up-9fe870724e9ad4581f18e9a4be241c1fcaf.png" srcset="/img/loading.gif"></p>
 </li>
 <li><p>下载canal-server的运行脚本</p>
  <div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">wget https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;alibaba&#x2F;canal&#x2F;master&#x2F;docker&#x2F;run.sh</code></pre></div>
@@ -319,7 +331,7 @@ run.sh -e canal.admin.manager&#x3D;127.0.0.1:8089 \
 <p> PS：在docker容器中，若非主机网络模式，127.0.0.1并非为主机的地址，Mac版可使用<strong>host.docker.internal</strong>访问到主机，Linux暂不支持，需要手动在容器中查询到主机的ip，替换掉上面的127.0.0.1</p>
 </li>
 <li><p>启动成功后，刷新admin页面的server列表，会出现刚刚启动的canal-server：</p>
-<p> <img src="https://s3.us-west-2.amazonaws.com/secure.notion-static.com/7b6ebad2-eee0-4028-ad27-bbb2961a6e96/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAT73L2G45O3KS52Y5/20210307/us-west-2/s3/aws4_request&X-Amz-Date=20210307T093741Z&X-Amz-Expires=86400&X-Amz-Signature=424185044b482bb3bc933fbb40d4bce6cfb51c309cd96a6d3376d2d9d01cdba9&X-Amz-SignedHeaders=host&response-content-disposition=filename%20=%22Untitled.png%22" srcset="/img/loading.gif" alt="canal%E5%9C%A8docker%E4%B8%8B%E7%9A%84%E6%90%AD%E5%BB%BA(canal-admin)%200c96ef4825d44603b2ea38472f28a3c7/Untitled%201.png"></p>
+<p> <img src="https://oscimg.oschina.net/oscnet/up-4aadd69d740610d80bfaf9c01b2047db717.png" srcset="/img/loading.gif"></p>
 <p> 至此，canal的创建与启动已经完成，在管理页面进行配置操作即可</p>
 </li>
 </ol>
@@ -387,7 +399,7 @@ canal.mq.partition&#x3D;0
 <div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">🍓 ➜  kafka_2.12-2.2.2 .&#x2F;bin&#x2F;kafka-console-consumer.sh --bootstrap-server 127.0.0.1:9092 --topic test_article</code></pre></div>
 
 <p>手动修改一条该表的数据，即可收到canal发送的数据库变更消息：</p>
-<p><img src="https://s3.us-west-2.amazonaws.com/secure.notion-static.com/cda00192-7e5f-484c-8ab4-687ba07552dc/Untitled.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAT73L2G45O3KS52Y5/20210307/us-west-2/s3/aws4_request&X-Amz-Date=20210307T093806Z&X-Amz-Expires=86400&X-Amz-Signature=c4e2f93c9c8483766758c32baca12437bae8782fd949673f9c3f463ab716e5b6&X-Amz-SignedHeaders=host&response-content-disposition=filename%20=%22Untitled.png%22" srcset="/img/loading.gif" alt="canal%E5%9C%A8docker%E4%B8%8B%E7%9A%84%E6%90%AD%E5%BB%BA(canal-admin)%200c96ef4825d44603b2ea38472f28a3c7/Untitled%202.png"></p>
+<p><img src="https://oscimg.oschina.net/oscnet/up-efdcbe72ea74b2357c99b31786999aaf840.png" srcset="/img/loading.gif"></p>
 <h2 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h2><p>总体的搭建过程还是比较简单的，admin模块为我们提供了一个可视化的管理界面，简单易用，单独使用canal-server模块也可以，但是修改配置起来比较麻烦。</p>
 <p>此外，在整个过程还是遇到了一些问题的，以下介绍几个踩坑点：</p>
 <ul>
@@ -846,6 +858,12 @@ canal.mq.partition&#x3D;0
                 <div class="post-prevnext row">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2021/03/25/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E7%9A%84%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8%E2%80%94%E2%80%94%E6%A0%B9%E6%8D%AE%E8%A1%A8%E5%85%B3%E7%B3%BB%E6%9E%84%E5%BB%BASQL%E8%AF%AD%E5%8F%A5/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">数据结构与算法的实际应用——根据表关系构建SQL语句</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
