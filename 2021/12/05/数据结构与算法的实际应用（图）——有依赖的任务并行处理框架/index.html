@@ -1,0 +1,758 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/assert/favorite.ico">
+  <link rel="icon" type="image/png" href="/assert/favorite.ico">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="Bai JunHan">
+  <meta name="keywords" content="">
+  <title>数据结构与算法的实际应用（图）——有依赖的任务并行处理框架 - Windlively</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      
+        
+          
+          
+          
+        
+        <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.22.0/themes/prism-solarizedlight.min.css" />
+      
+      
+        <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.22.0/plugins/line-numbers/prism-line-numbers.min.css" />
+      
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+  
+<link rel="stylesheet" href="/assert/css/styles.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.6","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":"❡"},"copy_btn":true,"image_zoom":{"enable":true},"lazyload":{"enable":true,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.2.0"></head>
+
+
+<body>
+  <header style="height: 50vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>Windlively</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner intro-2" id="background" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="数据结构与算法的实际应用（图）——有依赖的任务并行处理框架">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-author" aria-hidden="true"></i>
+      Bai JunHan
+    </span>
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-12-05 14:25" pubdate>
+        2021年12月5日 下午
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.3k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      42
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">数据结构与算法的实际应用（图）——有依赖的任务并行处理框架</h1>
+            
+              <p class="note note-info">
+                
+                  本文最后更新于：2 分钟前
+                
+              </p>
+            
+            <div class="markdown-body">
+              <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>一开始接到一个技改需求，需要将我们系统的一些首页查询接口进行优化，合并为一个聚合接口提供给前端；最初与前端同学进行交流，认为这些首页查询接口没有依赖关系，因此对于我来说解决方案比较简单，直接将需要查询的接口进行并行处理即可：</p>
+<p><img src="https://oscimg.oschina.net/oscnet/up-59831c52d5fc4f0f4f3b52eb09171897d61.png" srcset="/img/loading.gif"></p>
+<p>其中每一个查询抽象成了一个Function，在子线程中调用apply方法执行。</p>
+<p>但是在与前端同学联调时，发现其中一个接口的入参依赖另一个接口的结果，本想让前端给我传过来，但是这样的话又有一个接口会分离出去，影响首页加载速度，于是决定还是我后端想办法处理；如此一来，就需要解决查询时的前后依赖关系，一开始想了几种方案：</p>
+<ul>
+<li> 使用CountDownLatch进行等待</li>
+<li>拿到前一个依赖任务的Future，调用get方法等待</li>
+<li>有依赖的任务串行执行</li>
+</ul>
+<p>前两种方案大同小异，其实都是利用线程间的等待机制，待前置查询执行完成后，唤醒当前线程继续执行查询；第三种方案则简单粗暴，由于时间较紧，经过短暂思考后权利利弊还是决定用第三种方案，毕竟我现在只有两个子查询是有依赖的，这样做也是效率最高的办法；于是在生成查询的supplier中做了下手脚，将有依赖关系的Function通过andThen方法聚合为一个Function，便完成了需求，这样子查询顺序变成了（假设B依赖A）：</p>
+<p><img src="https://oscimg.oschina.net/oscnet/up-3595d011806ae4463d31dfaecb9fcca09ad.png" srcset="/img/loading.gif"></p>
+<p>至此，在需求上来说已经实现完成了，但是从技术角度来说不能算完整：假如新来了一个接口G，G也依赖于A，那么按照这种方案，ABG将会串行执行，然而BG之间没有依赖关系，它俩理应并行；又或者B依赖于A和C，则ABC会串行执行，然而AC应该并行才合理；再极端的例子，B依赖了ACEF，则整个聚合查询都退化为了单线程，显然更不合理。</p>
+<p>所以，虽然现阶段这种方案没什么问题，但对于复杂的依赖关系处理是远不够完善的，因此我又思考了有没有更好的方式去处理，并且能够有一定的通用性。</p>
+<h2 id="新的并行任务处理方案"><a href="#新的并行任务处理方案" class="headerlink" title="新的并行任务处理方案"></a>新的并行任务处理方案</h2><p>在此类需求中，其实比较重要的一点就是如何处理这些任务的依赖关系，而且尽可能的让他们并行处理，由此引入了一些图的应用。<br>在我的方案中，有以下几个概念：</p>
+<ul>
+<li>ExecutionContext：执行的上下文环境，所有子任务共用，用于处理数据交换和输入输出的问题，其实本质上是一个线程安全的Map。</li>
+<li>ExecutionNode：任务节点，即一个子任务的抽象，内部包含：名称、依赖节点名称、可执行的Function</li>
+<li>ExecutionGraph：整个任务流的执行图，包含所有的执行节点以及排序后的节点，任务流启动时将按照此类的描述执行。</li>
+<li>ExecutionFlow：任务流的抽象，本质上也是一个Function，调用apply方法开始执行。</li>
+<li>FlowConfiguration：任务执行的一些配置，包含前置Action、后置Action、线程执行器、超时时间等。<h3 id="图的生成"><a href="#图的生成" class="headerlink" title="图的生成"></a>图的生成</h3>ExecutionGraph是将任务的执行过程抽象成了一个有向无环图，在使用时，传入每个节点的定义及提前定义好的执行过程(Function)即可生成一个图。</li>
+</ul>
+<p>其中节点的定义规则为：<code>&#123;节点名称&#125;[&#123;依赖节点A&#125;,&#123;依赖节点B&#125;,...]</code></p>
+<p>若无依赖，则没有方括号中的内容。<br>具体在构建执行图时，则相当于是对这个有向图做了一个简单的排序（拓扑排序）：</p>
+<ol>
+<li>首先将所有节点加入到remainMap，preMap为空</li>
+<li>找到没有依赖的节点，作为第一层，并将这些节点从remainMap移除，加入到preMap中</li>
+<li>遍历remainMap，找到所有依赖节点均已经在preMap中出现的节点，加入到preMap，并在remainMap移除，这些元素作为下一层</li>
+<li>循环第3步，直至remainMap为空</li>
+</ol>
+<p>需要注意的是，第3步中，如果remainMap在筛选前后大小不变，则认为是出现了循环依赖，或者依赖了一个不存在的节点，即有向图中出现了环，应抛出异常，否则将陷入死循环。<br>核心代码如下：</p>
+<div class="code-wrapper"><pre class="line-numbers language-java" data-language="java"><code class="language-java">private static void buildGraph(Map&lt;String, ExecutionNode&gt; preNodes, Map&lt;String, ExecutionNode&gt; remainNode, List&lt;List&lt;ExecutionNode&gt;&gt; levels) &#123;
+
+        if (remainNode.isEmpty()) &#123;
+            return;
+        &#125;
+
+        List&lt;String&gt; curLevel;
+        int remainSize &#x3D; remainNode.size();
+        if (preNodes.isEmpty()) &#123;
+            &#x2F;&#x2F; 若preNodes为空，找出无依赖的节点，即入度为0的节点
+            curLevel &#x3D; remainNode.values()
+                    .stream()
+                    .filter(e -&gt; e.getDepend().length &#x3D;&#x3D; 0)
+                    .map(ExecutionNode::getName)
+                    .collect(Collectors.toList());
+            if (curLevel.isEmpty()) &#123;
+                throw new IllegalStateException(&quot;could not found init node&quot;);
+            &#125;
+        &#125; else &#123;
+            &#x2F;&#x2F; 继续寻找前置节点已处理的节点相当于继续寻找删除前面的节点依赖后，入度为0的节点
+            curLevel &#x3D; remainNode.entrySet()
+                    .stream()
+                    .filter(e -&gt; Stream.of(e.getValue().getDepend()).allMatch(preNodes::containsKey))
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+        &#125;
+
+        List&lt;ExecutionNode&gt; nodes &#x3D; new ArrayList&lt;&gt;(curLevel.size());
+        for (String name : curLevel) &#123;
+            nodes.add(remainNode.get(name));
+            preNodes.put(name, remainNode.remove(name));
+        &#125;
+
+        &#x2F;&#x2F; 若为剩余节点数量不变，说明图中有环形结构，或依赖了未定义的节点
+        if (remainNode.size() &#x3D;&#x3D; remainSize) &#123;
+            throw new IllegalStateException(&quot;there may be circular dependencies or dependency does not exist in your graph, exception nodes is: &quot; + remainNode.values());
+        &#125;
+
+        levels.add(nodes);
+        buildGraph(preNodes, remainNode, levels);
+    &#125;</code></pre></div>
+<p>示例<br>简单介绍个例子，对于如下节点定义：</p>
+<div class="code-wrapper"><pre class="line-numbers language-js" data-language="js"><code class="language-js">A
+B
+C
+D
+E[A,B]
+F[A,E]
+G[C]
+H[B,C]
+I[G,H]
+J[I]
+K[D,E]
+L[E,H]</code></pre></div>
+<p>则对应的图为：</p>
+<p><img src="https://oscimg.oschina.net/oscnet/up-cc1d5773a30306c4a8f5fe6bc48584bac9b.png" srcset="/img/loading.gif"></p>
+<p>这样，所有的执行任务被分为了四层，每一层之间的任务是互不依赖的，同时下一层的执行依赖上一层。</p>
+<h3 id="任务节点执行方案"><a href="#任务节点执行方案" class="headerlink" title="任务节点执行方案"></a>任务节点执行方案</h3><p>按照这种图的排序算法分割之后，剩下的就比较简单了，我能想到的有两种方式：</p>
+<ol>
+<li>每一层并行执行，全部完成之后执行下一层</li>
+<li>利用线程间等待机制，等待前置任务执行完成通知当前线程</li>
+</ol>
+<p>第一种我觉得不算很好，例如上图，考虑如下情况：L的执行时间较长，大于I和J的执行时间总和，即 <em>t(L)  &gt; t(I) + t(J)_，则J完全没必要等待第三层全部执行完成，当I结束之后J就可以执行，若 _t(J) &gt; t(L)</em> 时，更是浪费了较多时间。<br>所以我采用了<code>CompleteFuture</code>的get方法阻塞有依赖的线程，只要前置任务执行完毕，当前任务就可以开始，而不必等待上一层所有的任务执行完毕。</p>
+<p>方案如下：</p>
+<ol>
+<li><p>遍历每一层节点</p>
+<p>   a. 对于当前层级的每一个节点，生成CompleteFuture，在构造Supplier时，先从futureMap获取所有的依赖节点的Future，循环调用其get方法，阻塞当前线程（若已经执行完成则直接返回结果，此处也可以使用allOf.get()方法代替）</p>
+<p>  b. 将构造完成的CompleteFuture加入futureMap中</p>
+</li>
+<li><p>将futureMap所有的CompleteFuture取出来，使用allOf(…).get()方法等待全部执行完成。</p>
+</li>
+</ol>
+<p>理论上每一个节点只要前置执行完成，它就会开始，但是实际上，由于线程池调度等原因，可能还会在阻塞队列中等待一段时间，但是站在系统资源分配的角度，可以接受其带来的影响。<br>实现的核心代码：（其实这种传入参数并生成新函数的方式还有一个高大上的名字：函数柯里化？=_= ）</p>
+<div class="code-wrapper"><pre class="line-numbers language-java" data-language="java"><code class="language-java">&#x2F;**
+ * 生成一个执行任务，返回的是一个新函数
+ *
+ * @param executionGraph    执行任务图
+ * @param flowConfiguration 执行参数
+ * 
+ *&#x2F;
+static ExecutionFlow buildFlow(@NotNull ExecutionGraph executionGraph, @NotNull FlowConfiguration flowConfiguration) &#123;
+    SpelExpressionParser expressionParser &#x3D; new SpelExpressionParser();
+    return ctx -&gt; &#123;
+        long startTime &#x3D; System.currentTimeMillis();
+        List&lt;List&lt;ExecutionNode&gt;&gt; sortedNodes &#x3D; executionGraph.getSortedNodes();
+        Map&lt;String, CompletableFuture&lt;ExecutionContext&gt;&gt; futureMap &#x3D; new HashMap&lt;&gt;(16);
+        &#x2F;&#x2F; 按图序构建CompleteFuture
+        for (List&lt;ExecutionNode&gt; nodes : sortedNodes) &#123;
+            &#x2F;&#x2F; 同一层级之间的节点没有依赖，且依赖的CompletableFuture一定已经构建完成
+            for (ExecutionNode node : nodes) &#123;
+                String currNodeName &#x3D; node.getName();
+                CompletableFuture&lt;ExecutionContext&gt; future &#x3D; CompletableFuture.supplyAsync(() -&gt; &#123;
+                    try &#123;
+                        long t1 &#x3D; System.currentTimeMillis();
+                        &#x2F;&#x2F; 前置操作
+                        ofNullable(flowConfiguration.getPreAction()).ifPresent(c -&gt; c.accept(ctx));
+                        String[] depend &#x3D; node.getDepend();
+                        &#x2F;&#x2F; 遍历依赖节点，确保依赖节点已经执行完成
+                        for (String s : depend) &#123;
+                            try &#123;
+                                &#x2F;&#x2F; 阻塞等待
+                                futureMap.get(s).get();
+                                LogUtils.info(LOGGER, &quot;current node [&#123;0&#125;] waiting node [&#123;1&#125;] done (&#123;2&#125;ms)&quot;, currNodeName, s, System.currentTimeMillis() - t1);
+                            &#125; catch (InterruptedException | ExecutionException e) &#123;
+                                throw new IllegalStateException(&quot;current node [&quot; + currNodeName + &quot;] waiting node [&quot; + s + &quot;] failed&quot;, e);
+                            &#125;
+                        &#125;
+                        long t2 &#x3D; System.currentTimeMillis();
+                        LogUtils.info(LOGGER, &quot;current node [&#123;0&#125;] start&quot;, currNodeName);
+
+                        &#x2F;&#x2F; 前置表达式参数检查
+                        if (StringUtils.isNotBlank(node.getBeforeCheckExpression()) &amp;&amp;
+                            !expressionParser.parseExpression(node.getBeforeCheckExpression()).getValue(ctx.getCtx(), boolean.class)) &#123;
+                            throw new IllegalStateException(String.format(&quot;before check failed by expression [%s]&quot;, node.getBeforeCheckExpression()));
+                        &#125;
+                        &#x2F;&#x2F; 执行节点
+                        ExecutionContext ret &#x3D; node.getExecution().apply(ctx);
+                        &#x2F;&#x2F; 用于标识节点是否正确执行
+                        ctx.setVar(&quot;$&quot; + currNodeName + &quot;_success&quot;, true);
+
+                        &#x2F;&#x2F; 后置表达式参数检查
+                        if (StringUtils.isNotBlank(node.getAfterCheckExpression()) &amp;&amp;
+                            !expressionParser.parseExpression(node.getAfterCheckExpression()).getValue(ctx.getCtx(), boolean.class)) &#123;
+                            throw new IllegalStateException(String.format(&quot;after check failed by expression [%s]&quot;, node.getAfterCheckExpression()));
+                        &#125;
+                        long tl &#x3D; System.currentTimeMillis();
+                        LogUtils.info(LOGGER, &quot;current node [&#123;0&#125;] execute done (total: &#123;1&#125;ms, execution: &#123;2&#125;ms)&quot;, currNodeName, tl - t1, tl - t2);
+                        return ret;
+                    &#125; catch (Throwable e) &#123;
+                        LogUtils.warn(LOGGER, &quot;current node [&#123;0&#125;] execute failed: &#123;1&#125;, skip exception&#x3D;&quot;, e, currNodeName, e.getMessage(), node.isSkipOnFail());
+                        if (node.isSkipOnFail()) &#123;
+                            return ctx;
+                        &#125;
+                        throw e;
+                    &#125; finally &#123;
+                        &#x2F;&#x2F; 后置操作
+                        ofNullable(flowConfiguration.getFinalAction()).ifPresent(c -&gt; c.accept(ctx));
+                    &#125;
+                &#125;, flowConfiguration.getExecutor() &#x3D;&#x3D; null ? ForkJoinPool.commonPool() : flowConfiguration.getExecutor());
+                &#x2F;&#x2F; 将构建好的CompletableFuture放入Map
+                futureMap.put(node.getName(), future);
+            &#125;
+        &#125;
+        try &#123;
+            &#x2F;&#x2F; 组合所有的Future，等待所有节点行完毕
+            CompletableFuture&lt;Void&gt; completableFuture &#x3D; CompletableFuture.allOf(futureMap.values().toArray(new CompletableFuture[0]));
+            LogUtils.info(LOGGER, &quot;waiting flow execution down, ttl&#x3D;&#123;0&#125;&quot;, flowConfiguration.getTimeout());
+            if(flowConfiguration.getTimeout() &gt; 0) &#123;
+                completableFuture.get(flowConfiguration.getTimeout(), TimeUnit.SECONDS);
+            &#125; else &#123;
+                completableFuture.get();
+            &#125;
+            LogUtils.info(LOGGER, &quot;execution flow success (&#123;0&#125;ms)&quot;, System.currentTimeMillis() - startTime);
+            return ctx;
+        &#125; catch (InterruptedException | ExecutionException | TimeoutException e) &#123;
+            LogUtils.warn(LOGGER, &quot;execution flow failed: &#123;0&#125; (&#123;1&#125;ms)&quot;, e.getMessage(), System.currentTimeMillis() - startTime);
+            throw new IllegalStateException(e);
+        &#125;
+    &#125;;
+&#125;</code></pre></div>
+<h3 id="扩展功能"><a href="#扩展功能" class="headerlink" title="扩展功能"></a>扩展功能</h3><p>虽然已经完成了我们需要的功能，但是还不够完善，例如在实际执行每一个节点时，有的节点可以容忍失败，有的不可以，或者想在节点执行前后能检查一些参数是否满足要求，等等，所以我在这里又对节点定义的表达式做了一些增强，以此来支持一些额外的操作，同时也能在后续进行扩展：</p>
+<p>在原有的基础上做一下改造：</p>
+<p><code>&#123;节点名称&#125;[&#123;依赖节点A&#125;,&#123;依赖节点B&#125;, ...](&#123;扩展操作A名称&#125;(&#123;表达式&#125;), &#123;扩展操作A名称&#125;(&#123;表达式&#125;), ...)</code></p>
+<h4 id="是否忽略失败"><a href="#是否忽略失败" class="headerlink" title="是否忽略失败"></a>是否忽略失败</h4><p>用于在当前节点执行发生异常的时候，是否将异常抛出，还是忽略这个异常</p>
+<p>扩展名称：<code>skipOnFail</code></p>
+<p>示例：<code>E[A,B](skipOnFail(true))</code></p>
+<div class="code-wrapper"><pre class="line-numbers language-java" data-language="java"><code class="language-java">......
+&#125; catch (Throwable e) &#123;
+  log.warn(&quot;current node [&#123;&#125;] execute failed: &#123;&#125;, skip exception&#x3D;&#123;&#125;&quot;, currNodeName, e.getMessage(), node.isSkipOnFail(), e);
+  if (node.isSkipOnFail()) &#123;
+    return ctx;
+  &#125;
+	throw e;
+&#125; finally &#123;
+......</code></pre></div>
+<h4 id="参数检查"><a href="#参数检查" class="headerlink" title="参数检查"></a>参数检查</h4><p>在针对有依赖的场景下，当前节点如何知道所依赖的节点是否执行正常呢，若有异常，我们可以通过异常得知执行失败，但是有时候不会有异常抛出（例如调用的子方法有拦截器的时候，有可能在拦截器中会处理掉异常信息），需要检查数据才能得知是否正确执行，如果把这个检查的操作由节点内部定义的函数来做，似乎是比较繁琐的，而且这一部分我觉得由框架来统一处理掉是比较合适的，我想到的方案是用表达式的形式来检查参数：<br>给每个节点增加一个前置和后置的表达式，表达式的返回值是boolean类型，若为false则抛出异常；</p>
+<p>表达式结构：<code>&#123;节点名称&#125;[&#123;依赖节点A&#125;,&#123;依赖节点B&#125;, ...](beforeCheck(&#123;布尔表达式&#125;), afterCheck(&#123;布尔表达式&#125;))</code></p>
+<p>示例：<code>J[I](beforeCheck([c] == 0 &amp;&amp; [k] == 9 &amp;&amp; [c] != null), afterCheck([a] == 1))</code> </p>
+<p>表达式遵循SpringEL语法，解析时的上下文为ExecutionContext中的变量</p>
+<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><p>在引入SpringEL表达式之后，其扩展性已经非常强了，Spring表达式支持Java的许多语法、Spring Bean的调用、方法调用等，例如可以仅用配置表达式的方式，在表达式中通过Bean调用的方式定义任务执行过程，并自动设置出入参，配置出一个任务流程，而无需再在代码中预先定义好functionMap。</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95/">数据结构与算法</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%9B%BE/">图</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E6%8B%93%E6%89%91%E6%8E%92%E5%BA%8F/">拓扑排序</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/">多线程</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/03/25/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%B8%8E%E7%AE%97%E6%B3%95%E7%9A%84%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8%E2%80%94%E2%80%94%E6%A0%B9%E6%8D%AE%E8%A1%A8%E5%85%B3%E7%B3%BB%E6%9E%84%E5%BB%BASQL%E8%AF%AD%E5%8F%A5/">
+                        <span class="hidden-mobile">数据结构与算法的实际应用——根据表关系构建SQL语句</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <article class="comments" id="comments">
+                
+                
+  <div id="vcomments"></div>
+  <script type="text/javascript">
+    Fluid.utils.waitElementVisible('vcomments', function() {
+      Fluid.utils.createScript('https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js', function () {
+        new Valine({
+          el: "#vcomments",
+          app_id: "QkswS3xEGrTbK0dmA0NX2KTV-gzGzoHsz",
+          app_key: "uiXDBJGFOOhknLymw8GW28MN",
+          placeholder: "说点什么",
+          path: window.location.pathname,
+          avatar: "retro",
+          meta: ["nick","mail","link"],
+          pageSize: "10",
+          lang: "zh-CN",
+          highlight: false,
+          recordIP: false,
+          serverURLs: "",
+        });
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the
+    <a target="_blank" href="https://valine.js.org" rel="nofollow noopener noopener">comments powered by Valine.</a>
+  </noscript>
+
+
+              </article>
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     Powered&nbsp;By&nbsp;<a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span style="font-weight: bolder">Hexo</span></a> <i class="iconfont icon-love"></i>&nbsp;Theme:  <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span style="font-weight: bolder">Fluid</span></a> 
+  </div>
+  
+  <div class="statistics">
+    
+    
+
+    
+      
+        <!-- 不蒜子统计PV -->
+        <span id="busuanzi_container_site_pv" style="display: none">
+            总访问量 
+            <span id="busuanzi_value_site_pv"></span>
+             次
+          </span>
+      
+      
+        <!-- 不蒜子统计UV -->
+        <span id="busuanzi_container_site_uv" style="display: none">
+            总访客数 
+            <span id="busuanzi_value_site_uv"></span>
+             人
+          </span>
+      
+    
+  </div>
+
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":200})
+    NProgress.start()
+    document.addEventListener('DOMContentLoaded', function() {
+      window.NProgress && window.NProgress.inc();
+    })
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  
+    
+      <script  src="https://cdn.jsdelivr.net/npm/prismjs@1.22.0/components/prism-core.min.js" ></script>
+      <script  src="https://cdn.jsdelivr.net/npm/prismjs@1.22.0/plugins/autoloader/prism-autoloader.min.js" ></script>
+      
+        <script  src="https://cdn.jsdelivr.net/npm/prismjs@1.22.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
+      
+    
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+
+</body>
+</html>
