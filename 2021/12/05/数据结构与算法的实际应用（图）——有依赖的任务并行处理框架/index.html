@@ -205,7 +205,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      3.3k 字
+      5.5k 字
     </span>
   
 
@@ -215,7 +215,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      42
+      83
        分钟
     </span>
   
@@ -257,13 +257,13 @@
             
               <p class="note note-info">
                 
-                  本文最后更新于：2 分钟前
+                  本文最后更新于：5 分钟前
                 
               </p>
             
             <div class="markdown-body">
               <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>一开始接到一个技改需求，需要将我们系统的一些首页查询接口进行优化，合并为一个聚合接口提供给前端；最初与前端同学进行交流，认为这些首页查询接口没有依赖关系，因此对于我来说解决方案比较简单，直接将需要查询的接口进行并行处理即可：</p>
-<p><img src="https://oscimg.oschina.net/oscnet/up-59831c52d5fc4f0f4f3b52eb09171897d61.png" srcset="/img/loading.gif"></p>
+<p><img src="https://oscimg.oschina.net/oscnet/up-94bcd2805685f7f54111ef056462846b866.png" srcset="/img/loading.gif"></p>
 <p>其中每一个查询抽象成了一个Function，在子线程中调用apply方法执行。</p>
 <p>但是在与前端同学联调时，发现其中一个接口的入参依赖另一个接口的结果，本想让前端给我传过来，但是这样的话又有一个接口会分离出去，影响首页加载速度，于是决定还是我后端想办法处理；如此一来，就需要解决查询时的前后依赖关系，一开始想了几种方案：</p>
 <ul>
@@ -272,10 +272,10 @@
 <li>有依赖的任务串行执行</li>
 </ul>
 <p>前两种方案大同小异，其实都是利用线程间的等待机制，待前置查询执行完成后，唤醒当前线程继续执行查询；第三种方案则简单粗暴，由于时间较紧，经过短暂思考后权利利弊还是决定用第三种方案，毕竟我现在只有两个子查询是有依赖的，这样做也是效率最高的办法；于是在生成查询的supplier中做了下手脚，将有依赖关系的Function通过andThen方法聚合为一个Function，便完成了需求，这样子查询顺序变成了（假设B依赖A）：</p>
-<p><img src="https://oscimg.oschina.net/oscnet/up-3595d011806ae4463d31dfaecb9fcca09ad.png" srcset="/img/loading.gif"></p>
+<p><img src="https://oscimg.oschina.net/oscnet/up-7ec52bb218f4ac8773cb5726ac34e47e4d2.png" srcset="/img/loading.gif"></p>
 <p>至此，在需求上来说已经实现完成了，但是从技术角度来说不能算完整：假如新来了一个接口G，G也依赖于A，那么按照这种方案，ABG将会串行执行，然而BG之间没有依赖关系，它俩理应并行；又或者B依赖于A和C，则ABC会串行执行，然而AC应该并行才合理；再极端的例子，B依赖了ACEF，则整个聚合查询都退化为了单线程，显然更不合理。</p>
 <p>所以，虽然现阶段这种方案没什么问题，但对于复杂的依赖关系处理是远不够完善的，因此我又思考了有没有更好的方式去处理，并且能够有一定的通用性。</p>
-<h2 id="新的并行任务处理方案"><a href="#新的并行任务处理方案" class="headerlink" title="新的并行任务处理方案"></a>新的并行任务处理方案</h2><p>在此类需求中，其实比较重要的一点就是如何处理这些任务的依赖关系，而且尽可能的让他们并行处理，由此引入了一些图的应用。<br>在我的方案中，有以下几个概念：</p>
+<h2 id="重构的并行任务处理方案"><a href="#重构的并行任务处理方案" class="headerlink" title="重构的并行任务处理方案"></a>重构的并行任务处理方案</h2><p>在此类需求中，其实比较重要的一点就是如何处理这些任务的依赖关系，而且尽可能的让他们并行处理，由此引入了一些图的应用。<br>在我的方案中，有以下几个概念：</p>
 <ul>
 <li>ExecutionContext：执行的上下文环境，所有子任务共用，用于处理数据交换和输入输出的问题，其实本质上是一个线程安全的Map。</li>
 <li>ExecutionNode：任务节点，即一个子任务的抽象，内部包含：名称、依赖节点名称、可执行的Function</li>
@@ -292,47 +292,61 @@
 <li>循环第3步，直至remainMap为空</li>
 </ol>
 <p>需要注意的是，第3步中，如果remainMap在筛选前后大小不变，则认为是出现了循环依赖，或者依赖了一个不存在的节点，即有向图中出现了环，应抛出异常，否则将陷入死循环。<br>核心代码如下：</p>
-<div class="code-wrapper"><pre class="line-numbers language-java" data-language="java"><code class="language-java">private static void buildGraph(Map&lt;String, ExecutionNode&gt; preNodes, Map&lt;String, ExecutionNode&gt; remainNode, List&lt;List&lt;ExecutionNode&gt;&gt; levels) &#123;
+<div class="code-wrapper"><pre class="line-numbers language-java" data-language="java"><code class="language-java">&#x2F;**
+ * 构建执行图，实质上是对节点做排序
+ *
+ * @param preNodes   已处理的节点
+ * @param remainNode 剩余节点
+ * @param levels     有序节点（结果集）
+ *&#x2F;
+private static void buildGraph(Map&lt;String, ExecutionNode&gt; preNodes, Map&lt;String, ExecutionNode&gt; remainNode, List&lt;List&lt;ExecutionNode&gt;&gt; levels) &#123;
 
-        if (remainNode.isEmpty()) &#123;
-            return;
+    &#x2F;&#x2F; 若剩余节点为空，结束
+    if (remainNode.isEmpty()) &#123;
+        return;
+    &#125;
+
+    List&lt;String&gt; currentLevel;
+    &#x2F;&#x2F; 记录剩余节点个数
+    int remainSize &#x3D; remainNode.size();
+
+    if (preNodes.isEmpty()) &#123;
+        &#x2F;&#x2F; 若preNodes为空，则为第一层，找出无依赖的节点，即入度为0的节点
+        currentLevel &#x3D; remainNode.values()
+                .stream()
+                .filter(e -&gt; e.getDepend().length &#x3D;&#x3D; 0)
+                .map(ExecutionNode::getName)
+                .collect(Collectors.toList());
+        &#x2F;&#x2F; 若没有无依赖的节点，抛出异常
+        if (currentLevel.isEmpty()) &#123;
+            throw new IllegalStateException(&quot;could not found init node&quot;);
         &#125;
+    &#125; else &#123;
+        &#x2F;&#x2F; 继续寻找前置节点已处理的节点，相当于继续寻找删除前面的节点依赖后，入度为0的节点
+        currentLevel &#x3D; remainNode.entrySet()
+                .stream()
+                .filter(e -&gt; Stream.of(e.getValue().getDepend()).allMatch(preNodes::containsKey))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+    &#125;
 
-        List&lt;String&gt; curLevel;
-        int remainSize &#x3D; remainNode.size();
-        if (preNodes.isEmpty()) &#123;
-            &#x2F;&#x2F; 若preNodes为空，找出无依赖的节点，即入度为0的节点
-            curLevel &#x3D; remainNode.values()
-                    .stream()
-                    .filter(e -&gt; e.getDepend().length &#x3D;&#x3D; 0)
-                    .map(ExecutionNode::getName)
-                    .collect(Collectors.toList());
-            if (curLevel.isEmpty()) &#123;
-                throw new IllegalStateException(&quot;could not found init node&quot;);
-            &#125;
-        &#125; else &#123;
-            &#x2F;&#x2F; 继续寻找前置节点已处理的节点相当于继续寻找删除前面的节点依赖后，入度为0的节点
-            curLevel &#x3D; remainNode.entrySet()
-                    .stream()
-                    .filter(e -&gt; Stream.of(e.getValue().getDepend()).allMatch(preNodes::containsKey))
-                    .map(Map.Entry::getKey)
-                    .collect(Collectors.toList());
-        &#125;
+    List&lt;ExecutionNode&gt; nodes &#x3D; new ArrayList&lt;&gt;(currentLevel.size());
+    &#x2F;&#x2F; currentLevel中为当前层级的节点，将其加入preNodes中记录起来，并从剩余节点中移除
+    for (String name : currentLevel) &#123;
+        nodes.add(remainNode.get(name));
+        preNodes.put(name, remainNode.remove(name));
+    &#125;
 
-        List&lt;ExecutionNode&gt; nodes &#x3D; new ArrayList&lt;&gt;(curLevel.size());
-        for (String name : curLevel) &#123;
-            nodes.add(remainNode.get(name));
-            preNodes.put(name, remainNode.remove(name));
-        &#125;
+    &#x2F;&#x2F; 若为剩余节点数量不变，说明图中有环形结构，或依赖了未定义的节点
+    if (remainNode.size() &#x3D;&#x3D; remainSize) &#123;
+        throw new IllegalStateException(&quot;there may be circular dependencies or dependency does not exist in your graph, exception nodes is: &quot; + remainNode.values());
+    &#125;
 
-        &#x2F;&#x2F; 若为剩余节点数量不变，说明图中有环形结构，或依赖了未定义的节点
-        if (remainNode.size() &#x3D;&#x3D; remainSize) &#123;
-            throw new IllegalStateException(&quot;there may be circular dependencies or dependency does not exist in your graph, exception nodes is: &quot; + remainNode.values());
-        &#125;
-
-        levels.add(nodes);
-        buildGraph(preNodes, remainNode, levels);
-    &#125;</code></pre></div>
+    &#x2F;&#x2F; 放入结果集
+    levels.add(nodes);
+    &#x2F;&#x2F; 递归至下一层
+    buildGraph(preNodes, remainNode, levels);
+&#125;</code></pre></div>
 <p>示例<br>简单介绍个例子，对于如下节点定义：</p>
 <div class="code-wrapper"><pre class="line-numbers language-js" data-language="js"><code class="language-js">A
 B
@@ -347,14 +361,14 @@ J[I]
 K[D,E]
 L[E,H]</code></pre></div>
 <p>则对应的图为：</p>
-<p><img src="https://oscimg.oschina.net/oscnet/up-cc1d5773a30306c4a8f5fe6bc48584bac9b.png" srcset="/img/loading.gif"></p>
+<p><img src="https://oscimg.oschina.net/oscnet/up-5074a3c6b4d37400bf48ff6264b4a8efdeb.png" srcset="/img/loading.gif"></p>
 <p>这样，所有的执行任务被分为了四层，每一层之间的任务是互不依赖的，同时下一层的执行依赖上一层。</p>
 <h3 id="任务节点执行方案"><a href="#任务节点执行方案" class="headerlink" title="任务节点执行方案"></a>任务节点执行方案</h3><p>按照这种图的排序算法分割之后，剩下的就比较简单了，我能想到的有两种方式：</p>
 <ol>
 <li>每一层并行执行，全部完成之后执行下一层</li>
 <li>利用线程间等待机制，等待前置任务执行完成通知当前线程</li>
 </ol>
-<p>第一种我觉得不算很好，例如上图，考虑如下情况：L的执行时间较长，大于I和J的执行时间总和，即 <em>t(L)  &gt; t(I) + t(J)_，则J完全没必要等待第三层全部执行完成，当I结束之后J就可以执行，若 _t(J) &gt; t(L)</em> 时，更是浪费了较多时间。<br>所以我采用了<code>CompleteFuture</code>的get方法阻塞有依赖的线程，只要前置任务执行完毕，当前任务就可以开始，而不必等待上一层所有的任务执行完毕。</p>
+<p>第一种我觉得不算很好，例如上图，考虑如下情况：L的执行时间较长，大于I和J的执行时间总和，即 t(L)  &gt; t(I) + t(J)，则J完全没必要等待第三层全部执行完成，当I结束之后J就可以执行，若t(J) &gt; t(L)时，更是浪费了较多时间。<br>所以我采用了CompleteFuture的get方法阻塞有依赖的线程，只要前置任务执行完毕，当前任务就可以开始，而不必等待上一层所有的任务执行完毕。</p>
 <p>方案如下：</p>
 <ol>
 <li><p>遍历每一层节点</p>
@@ -370,9 +384,9 @@ L[E,H]</code></pre></div>
  *
  * @param executionGraph    执行任务图
  * @param flowConfiguration 执行参数
- * 
+ * @return
  *&#x2F;
-static ExecutionFlow buildFlow(@NotNull ExecutionGraph executionGraph, @NotNull FlowConfiguration flowConfiguration) &#123;
+static ExecutionFlow buildFlow(@NonNull ExecutionGraph executionGraph, @NonNull FlowConfiguration flowConfiguration) &#123;
     SpelExpressionParser expressionParser &#x3D; new SpelExpressionParser();
     return ctx -&gt; &#123;
         long startTime &#x3D; System.currentTimeMillis();
@@ -394,18 +408,20 @@ static ExecutionFlow buildFlow(@NotNull ExecutionGraph executionGraph, @NotNull 
                             try &#123;
                                 &#x2F;&#x2F; 阻塞等待
                                 futureMap.get(s).get();
-                                LogUtils.info(LOGGER, &quot;current node [&#123;0&#125;] waiting node [&#123;1&#125;] done (&#123;2&#125;ms)&quot;, currNodeName, s, System.currentTimeMillis() - t1);
+                                logger.info(&quot;current node [&#123;&#125;] waiting node [&#123;&#125;] done (&#123;&#125;ms)&quot;, currNodeName, s, System.currentTimeMillis() - t1);
                             &#125; catch (InterruptedException | ExecutionException e) &#123;
                                 throw new IllegalStateException(&quot;current node [&quot; + currNodeName + &quot;] waiting node [&quot; + s + &quot;] failed&quot;, e);
                             &#125;
                         &#125;
                         long t2 &#x3D; System.currentTimeMillis();
-                        LogUtils.info(LOGGER, &quot;current node [&#123;0&#125;] start&quot;, currNodeName);
+                        logger.info(&quot;current node [&#123;&#125;] start&quot;, currNodeName);
 
                         &#x2F;&#x2F; 前置表达式参数检查
-                        if (StringUtils.isNotBlank(node.getBeforeCheckExpression()) &amp;&amp;
-                            !expressionParser.parseExpression(node.getBeforeCheckExpression()).getValue(ctx.getCtx(), boolean.class)) &#123;
-                            throw new IllegalStateException(String.format(&quot;before check failed by expression [%s]&quot;, node.getBeforeCheckExpression()));
+                        &#x2F;&#x2F;noinspection ConstantConditions
+                        if (Objects.nonNull(node.getBeforeCheckExpression()) &amp;&amp;
+                            !node.getBeforeCheckExpression().getValue(ctx.getCtx(), boolean.class)) &#123;
+                            throw new IllegalStateException(String.format(&quot;before check failed by expression [%s]&quot;
+                                    , node.getBeforeCheckExpression().getExpressionString()));
                         &#125;
                         &#x2F;&#x2F; 执行节点
                         ExecutionContext ret &#x3D; node.getExecution().apply(ctx);
@@ -413,15 +429,17 @@ static ExecutionFlow buildFlow(@NotNull ExecutionGraph executionGraph, @NotNull 
                         ctx.setVar(&quot;$&quot; + currNodeName + &quot;_success&quot;, true);
 
                         &#x2F;&#x2F; 后置表达式参数检查
-                        if (StringUtils.isNotBlank(node.getAfterCheckExpression()) &amp;&amp;
-                            !expressionParser.parseExpression(node.getAfterCheckExpression()).getValue(ctx.getCtx(), boolean.class)) &#123;
-                            throw new IllegalStateException(String.format(&quot;after check failed by expression [%s]&quot;, node.getAfterCheckExpression()));
+                        &#x2F;&#x2F;noinspection ConstantConditions
+                        if (Objects.nonNull(node.getAfterCheckExpression()) &amp;&amp;
+                            !node.getAfterCheckExpression().getValue(ctx.getCtx(), boolean.class)) &#123;
+                            throw new IllegalStateException(String.format(&quot;after check failed by expression [%s]&quot;
+                                    , node.getAfterCheckExpression().getExpressionString()));
                         &#125;
                         long tl &#x3D; System.currentTimeMillis();
-                        LogUtils.info(LOGGER, &quot;current node [&#123;0&#125;] execute done (total: &#123;1&#125;ms, execution: &#123;2&#125;ms)&quot;, currNodeName, tl - t1, tl - t2);
+                        logger.info(&quot;current node [&#123;&#125;] execute done (total: &#123;&#125;ms, execution: &#123;&#125;ms)&quot;, currNodeName, tl - t1, tl - t2);
                         return ret;
                     &#125; catch (Throwable e) &#123;
-                        LogUtils.warn(LOGGER, &quot;current node [&#123;0&#125;] execute failed: &#123;1&#125;, skip exception&#x3D;&quot;, e, currNodeName, e.getMessage(), node.isSkipOnFail());
+                        logger.warn(&quot;current node [&#123;&#125;] execute failed: &#123;&#125;, skip exception&#x3D;&#123;&#125;&quot;, currNodeName, e.getMessage(), node.isSkipOnFail(), e);
                         if (node.isSkipOnFail()) &#123;
                             return ctx;
                         &#125;
@@ -438,16 +456,16 @@ static ExecutionFlow buildFlow(@NotNull ExecutionGraph executionGraph, @NotNull 
         try &#123;
             &#x2F;&#x2F; 组合所有的Future，等待所有节点行完毕
             CompletableFuture&lt;Void&gt; completableFuture &#x3D; CompletableFuture.allOf(futureMap.values().toArray(new CompletableFuture[0]));
-            LogUtils.info(LOGGER, &quot;waiting flow execution down, ttl&#x3D;&#123;0&#125;&quot;, flowConfiguration.getTimeout());
-            if(flowConfiguration.getTimeout() &gt; 0) &#123;
+            logger.info(&quot;waiting flow execution down, ttl&#x3D;&#123;&#125;&quot;, flowConfiguration.getTimeout());
+            if (flowConfiguration.getTimeout() &gt; 0) &#123;
                 completableFuture.get(flowConfiguration.getTimeout(), TimeUnit.SECONDS);
             &#125; else &#123;
                 completableFuture.get();
             &#125;
-            LogUtils.info(LOGGER, &quot;execution flow success (&#123;0&#125;ms)&quot;, System.currentTimeMillis() - startTime);
+            logger.info(&quot;execution flow success (&#123;&#125;ms)&quot;, System.currentTimeMillis() - startTime);
             return ctx;
         &#125; catch (InterruptedException | ExecutionException | TimeoutException e) &#123;
-            LogUtils.warn(LOGGER, &quot;execution flow failed: &#123;0&#125; (&#123;1&#125;ms)&quot;, e.getMessage(), System.currentTimeMillis() - startTime);
+            logger.warn(&quot;execution flow failed: &#123;&#125; (&#123;&#125;ms)&quot;, e.getMessage(), System.currentTimeMillis() - startTime);
             throw new IllegalStateException(e);
         &#125;
     &#125;;
@@ -471,7 +489,126 @@ static ExecutionFlow buildFlow(@NotNull ExecutionGraph executionGraph, @NotNull 
 <p>表达式结构：<code>&#123;节点名称&#125;[&#123;依赖节点A&#125;,&#123;依赖节点B&#125;, ...](beforeCheck(&#123;布尔表达式&#125;), afterCheck(&#123;布尔表达式&#125;))</code></p>
 <p>示例：<code>J[I](beforeCheck([c] == 0 &amp;&amp; [k] == 9 &amp;&amp; [c] != null), afterCheck([a] == 1))</code> </p>
 <p>表达式遵循SpringEL语法，解析时的上下文为ExecutionContext中的变量</p>
-<h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><p>在引入SpringEL表达式之后，其扩展性已经非常强了，Spring表达式支持Java的许多语法、Spring Bean的调用、方法调用等，例如可以仅用配置表达式的方式，在表达式中通过Bean调用的方式定义任务执行过程，并自动设置出入参，配置出一个任务流程，而无需再在代码中预先定义好functionMap。</p>
+<h4 id="执行样例"><a href="#执行样例" class="headerlink" title="执行样例"></a>执行样例</h4><p>执行样例代码：</p>
+<div class="code-wrapper"><pre class="line-numbers language-java" data-language="java"><code class="language-java">public static void main(String[] args) &#123;
+    Random random &#x3D; new Random();
+    &#x2F;&#x2F; 简单映射一个函数集合，随机暂停一段时间，模拟函数执行，部分函数里面做了一些简单的值的设定，模拟结果输出
+    Map&lt;String, Function&lt;ExecutionContext, ExecutionContext&gt;&gt; functionMap &#x3D; Arrays.stream(&quot;A,B,C,D,E,F,G,H,I,J,K,L&quot;.split(&quot;,&quot;)).collect(Collectors.toMap(
+            e -&gt; e,
+            e -&gt; ctx -&gt; &#123;
+                try &#123;
+                    int i &#x3D; 500 + 500 * random.nextInt(5);
+                    Thread.sleep(i);
+                    ctx.setVar(e, i);
+                    switch (e) &#123;
+                        case &quot;A&quot;:
+                            ctx.setVar(&quot;a&quot;, 1);
+                            break;
+                        case &quot;B&quot;:
+                            ctx.setVar(&quot;a&quot;, 0);
+                            break;
+                        case &quot;C&quot;:
+                            ctx.setVar(&quot;c&quot;, 3);
+                            break;
+                        case &quot;G&quot;:
+                            ctx.setVar(&quot;g&quot;, 9);
+                            ctx.setVar(&quot;a&quot;, 1);
+                            break;
+                    &#125;
+                &#125; catch (InterruptedException ignored) &#123;
+                &#125;
+                return ctx;
+            &#125;
+    ));
+
+    &#x2F;&#x2F; 构造一个执行图的定义
+    ExecutionGraph graph &#x3D; ExecutionGraph.createGraph(new ArrayList&lt;&gt;() &#123;&#123;
+        add(&quot;A&quot;);
+        add(&quot;B[A](beforeCheck([a] &#x3D;&#x3D; 1))&quot;);
+        add(&quot;C&quot;);
+        add(&quot;D&quot;);
+        add(&quot;E[A,B](beforeCheck([a]&#x3D;&#x3D;2); skipOnFail(true))&quot;); &#x2F;&#x2F; 该节点会发生异常，但是配置了跳过
+        add(&quot;F[A,E]&quot;);
+        add(&quot;G[C]&quot;);
+        add(&quot;H[B,C]&quot;);
+        add(&quot;I[G,H]&quot;);
+        add(&quot;J[I](beforeCheck( T(java.util.Arrays).asList(1,2,3).contains([c]) and [g] &#x3D;&#x3D; [c]*[c] and [c] !&#x3D; null); afterCheck([c] &gt;&#x3D; 1))&quot;);
+        add(&quot;K[D,E]&quot;);
+        add(&quot;L[E,H]&quot;);
+    &#125;&#125;, functionMap);
+
+    &#x2F;&#x2F; CompletableFuture默认使用的ForkJoinPool.commonPool，可以试下使用cachedThreadPool会有什么不一样？
+    &#x2F;&#x2F; ExecutorService executorService &#x3D; Executors.newCachedThreadPool();
+    ExecutionFlow executionFlow &#x3D; ExecutionFlow.buildFlow(graph);
+    executionFlow.apply(new ExecutionContext());
+&#125;</code></pre></div>
+<p>执行日志：</p>
+<div class="code-wrapper"><pre class="line-numbers language-log" data-language="log"><code class="language-log">&#x2F;Library&#x2F;Java&#x2F;JavaVirtualMachines&#x2F;jdk-11.0.8.jdk&#x2F;Contents&#x2F;Home&#x2F;bin&#x2F;java -Dvisualvm.id&#x3D;76728482855487 -javaagent:&#x2F;Users&#x2F;windlively&#x2F;Library&#x2F;Application Support&#x2F;JetBrains&#x2F;Toolbox&#x2F;apps&#x2F;IDEA-U&#x2F;ch-0&#x2F;213.6461.79&#x2F;IntelliJ IDEA.app&#x2F;Contents&#x2F;lib&#x2F;idea_rt.jar&#x3D;55008:&#x2F;Users&#x2F;windlively&#x2F;Library&#x2F;Application Support&#x2F;JetBrains&#x2F;Toolbox&#x2F;apps&#x2F;IDEA-U&#x2F;ch-0&#x2F;213.6461.79&#x2F;IntelliJ IDEA.app&#x2F;Contents&#x2F;bin -Dfile.encoding&#x3D;UTF-8 -classpath &#x2F;Users&#x2F;windlively&#x2F;IdeaProjects&#x2F;leisure&#x2F;frame&#x2F;target&#x2F;classes:&#x2F;Users&#x2F;windlively&#x2F;.m2&#x2F;repository&#x2F;org&#x2F;projectlombok&#x2F;lombok&#x2F;1.18.10&#x2F;lombok-1.18.10.jar:&#x2F;Users&#x2F;windlively&#x2F;.m2&#x2F;repository&#x2F;org&#x2F;springframework&#x2F;spring-expression&#x2F;5.2.2.RELEASE&#x2F;spring-expression-5.2.2.RELEASE.jar:&#x2F;Users&#x2F;windlively&#x2F;.m2&#x2F;repository&#x2F;org&#x2F;springframework&#x2F;spring-core&#x2F;5.2.2.RELEASE&#x2F;spring-core-5.2.2.RELEASE.jar:&#x2F;Users&#x2F;windlively&#x2F;.m2&#x2F;repository&#x2F;org&#x2F;springframework&#x2F;spring-jcl&#x2F;5.2.2.RELEASE&#x2F;spring-jcl-5.2.2.RELEASE.jar:&#x2F;Users&#x2F;windlively&#x2F;.m2&#x2F;repository&#x2F;org&#x2F;springframework&#x2F;boot&#x2F;spring-boot-starter-logging&#x2F;2.2.2.RELEASE&#x2F;spring-boot-starter-logging-2.2.2.RELEASE.jar:&#x2F;Users&#x2F;windlively&#x2F;.m2&#x2F;repository&#x2F;ch&#x2F;qos&#x2F;logback&#x2F;logback-classic&#x2F;1.2.3&#x2F;logback-classic-1.2.3.jar:&#x2F;Users&#x2F;windlively&#x2F;.m2&#x2F;repository&#x2F;ch&#x2F;qos&#x2F;logback&#x2F;logback-core&#x2F;1.2.3&#x2F;logback-core-1.2.3.jar:&#x2F;Users&#x2F;windlively&#x2F;.m2&#x2F;repository&#x2F;org&#x2F;slf4j&#x2F;slf4j-api&#x2F;1.7.29&#x2F;slf4j-api-1.7.29.jar:&#x2F;Users&#x2F;windlively&#x2F;.m2&#x2F;repository&#x2F;org&#x2F;apache&#x2F;logging&#x2F;log4j&#x2F;log4j-to-slf4j&#x2F;2.12.1&#x2F;log4j-to-slf4j-2.12.1.jar:&#x2F;Users&#x2F;windlively&#x2F;.m2&#x2F;repository&#x2F;org&#x2F;apache&#x2F;logging&#x2F;log4j&#x2F;log4j-api&#x2F;2.12.1&#x2F;log4j-api-2.12.1.jar:&#x2F;Users&#x2F;windlively&#x2F;.m2&#x2F;repository&#x2F;org&#x2F;slf4j&#x2F;jul-to-slf4j&#x2F;1.7.29&#x2F;jul-to-slf4j-1.7.29.jar:&#x2F;Users&#x2F;windlively&#x2F;.m2&#x2F;repository&#x2F;org&#x2F;apache&#x2F;commons&#x2F;commons-lang3&#x2F;3.9&#x2F;commons-lang3-3.9.jar ink.windlively.frame.parallelprocessor.Main
+12:38:04.122 [main] INFO ink.windlively.frame.parallelprocessor.ExecutionGraph - start create graph, node definition: [A, B[A&lt;-](beforeCheck([a] &#x3D;&#x3D; 1)), C, D, E[A&lt;-,B&lt;-](beforeCheck([a]&#x3D;&#x3D;2),skipOnFail(true)), F[A&lt;-,E&lt;-], G[C&lt;-], H[B&lt;-,C&lt;-], I[G&lt;-,H&lt;-], J[I&lt;-](beforeCheck(T(java.util.Arrays).asList(1,2,3).contains([c]) and [g] &#x3D;&#x3D; [c]*[c] and [c] !&#x3D; null),afterCheck([c] &gt;&#x3D; 1)), K[D&lt;-,E&lt;-], L[E&lt;-,H&lt;-]]
+12:38:04.165 [main] INFO ink.windlively.frame.parallelprocessor.ExecutionGraph - build execution graph success: 
+A		C		D
+B[A&lt;-](beforeCheck([a] &#x3D;&#x3D; 1))		G[C&lt;-]
+E[A&lt;-,B&lt;-](beforeCheck([a]&#x3D;&#x3D;2),skipOnFail(true))		H[B&lt;-,C&lt;-]
+F[A&lt;-,E&lt;-]		I[G&lt;-,H&lt;-]		K[D&lt;-,E&lt;-]		L[E&lt;-,H&lt;-]
+J[I&lt;-](beforeCheck(T(java.util.Arrays).asList(1,2,3).contains([c]) and [g] &#x3D;&#x3D; [c]*[c] and [c] !&#x3D; null),afterCheck([c] &gt;&#x3D; 1))
+
+12:38:04.183 [main] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - waiting flow execution down, ttl&#x3D;0
+12:38:04.183 [ForkJoinPool.commonPool-worker-5] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [C] start
+12:38:04.184 [ForkJoinPool.commonPool-worker-3] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [A] start
+12:38:04.183 [ForkJoinPool.commonPool-worker-9] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [D] start
+12:38:05.189 [ForkJoinPool.commonPool-worker-9] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [D] execute done (total: 1006ms, execution: 1006ms)
+12:38:05.687 [ForkJoinPool.commonPool-worker-3] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [A] execute done (total: 1504ms, execution: 1503ms)
+12:38:05.689 [ForkJoinPool.commonPool-worker-9] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [F] waiting node [A] done (498ms)
+12:38:05.689 [ForkJoinPool.commonPool-worker-7] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [B] waiting node [A] done (1506ms)
+12:38:05.689 [ForkJoinPool.commonPool-worker-15] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [E] waiting node [A] done (1505ms)
+12:38:05.690 [ForkJoinPool.commonPool-worker-7] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [B] start
+12:38:06.688 [ForkJoinPool.commonPool-worker-5] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [C] execute done (total: 2505ms, execution: 2505ms)
+12:38:06.689 [ForkJoinPool.commonPool-worker-11] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [G] waiting node [C] done (2505ms)
+12:38:06.689 [ForkJoinPool.commonPool-worker-11] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [G] start
+12:38:06.689 [ForkJoinPool.commonPool-worker-5] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [K] waiting node [D] done (0ms)
+12:38:07.247 [ForkJoinPool.commonPool-worker-7] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [B] execute done (total: 3064ms, execution: 1557ms)
+12:38:07.248 [ForkJoinPool.commonPool-worker-15] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [E] waiting node [B] done (3064ms)
+12:38:07.248 [ForkJoinPool.commonPool-worker-13] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [H] waiting node [B] done (3064ms)
+12:38:07.248 [ForkJoinPool.commonPool-worker-15] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [E] start
+12:38:07.248 [ForkJoinPool.commonPool-worker-13] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [H] waiting node [C] done (3064ms)
+12:38:07.248 [ForkJoinPool.commonPool-worker-13] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [H] start
+12:38:07.261 [ForkJoinPool.commonPool-worker-15] WARN ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [E] execute failed: before check failed by expression [[a]&#x3D;&#x3D;2], skip exception&#x3D;true
+java.lang.IllegalStateException: before check failed by expression [[a]&#x3D;&#x3D;2]
+	at ink.windlively.frame.parallelprocessor.ExecutionFlow.lambda$buildFlow$2(ExecutionFlow.java:81)
+	at java.base&#x2F;java.util.concurrent.CompletableFuture$AsyncSupply.run(CompletableFuture.java:1700)
+	at java.base&#x2F;java.util.concurrent.CompletableFuture$AsyncSupply.exec(CompletableFuture.java:1692)
+	at java.base&#x2F;java.util.concurrent.ForkJoinTask.doExec(ForkJoinTask.java:290)
+	at java.base&#x2F;java.util.concurrent.ForkJoinPool$WorkQueue.topLevelExec(ForkJoinPool.java:1020)
+	at java.base&#x2F;java.util.concurrent.ForkJoinPool.scan(ForkJoinPool.java:1656)
+	at java.base&#x2F;java.util.concurrent.ForkJoinPool.runWorker(ForkJoinPool.java:1594)
+	at java.base&#x2F;java.util.concurrent.ForkJoinWorkerThread.run(ForkJoinWorkerThread.java:183)
+12:38:07.262 [ForkJoinPool.commonPool-worker-9] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [F] waiting node [E] done (2071ms)
+12:38:07.262 [ForkJoinPool.commonPool-worker-9] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [F] start
+12:38:07.262 [ForkJoinPool.commonPool-worker-5] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [K] waiting node [E] done (573ms)
+12:38:07.262 [ForkJoinPool.commonPool-worker-7] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [L] waiting node [E] done (14ms)
+12:38:07.262 [ForkJoinPool.commonPool-worker-5] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [K] start
+12:38:07.767 [ForkJoinPool.commonPool-worker-9] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [F] execute done (total: 2576ms, execution: 505ms)
+12:38:08.194 [ForkJoinPool.commonPool-worker-11] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [G] execute done (total: 4010ms, execution: 1505ms)
+12:38:08.195 [ForkJoinPool.commonPool-worker-3] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [I] waiting node [G] done (2506ms)
+12:38:09.266 [ForkJoinPool.commonPool-worker-5] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [K] execute done (total: 2577ms, execution: 2004ms)
+12:38:09.749 [ForkJoinPool.commonPool-worker-13] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [H] execute done (total: 5565ms, execution: 2501ms)
+12:38:09.750 [ForkJoinPool.commonPool-worker-7] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [L] waiting node [H] done (2502ms)
+12:38:09.750 [ForkJoinPool.commonPool-worker-3] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [I] waiting node [H] done (4062ms)
+12:38:09.751 [ForkJoinPool.commonPool-worker-7] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [L] start
+12:38:09.751 [ForkJoinPool.commonPool-worker-3] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [I] start
+12:38:10.753 [ForkJoinPool.commonPool-worker-7] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [L] execute done (total: 3505ms, execution: 1002ms)
+12:38:11.752 [ForkJoinPool.commonPool-worker-3] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [I] execute done (total: 6064ms, execution: 2001ms)
+12:38:11.753 [ForkJoinPool.commonPool-worker-15] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [J] waiting node [I] done (4491ms)
+12:38:11.753 [ForkJoinPool.commonPool-worker-15] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [J] start
+12:38:12.301 [ForkJoinPool.commonPool-worker-15] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - current node [J] execute done (total: 5039ms, execution: 548ms)
+12:38:12.301 [main] INFO ink.windlively.frame.parallelprocessor.ExecutionFlow - execution flow success (8130ms)
+
+进程已结束,退出代码0
+</code></pre></div>
+
+<h4 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h4><p>在引入SpringEL表达式之后，其扩展性已经非常强了，Spring表达式支持Java的许多语法、Spring Bean的调用、方法调用等，例如可以仅用配置表达式的方式，在表达式中通过Bean调用的方式定义任务执行过程，并自动设置出入参，配置出一个任务流程，而无需再在代码中预先定义好functionMap。</p>
+<h4 id="代码地址"><a href="#代码地址" class="headerlink" title="代码地址"></a>代码地址</h4><p>GitHub：<a target="_blank" rel="noopener" href="https://github.com/windlively/leisure/tree/master/frame/src/main/java/ink/windlively/frame/parallelprocessor">https://github.com/windlively/leisure/tree/master/frame/src/main/java/ink/windlively/frame/parallelprocessor</a></p>
+<p>Gitee：<a target="_blank" rel="noopener" href="https://gitee.com/windlively/leisure/tree/master/frame/src/main/java/ink/windlively/frame/parallelprocessor">https://gitee.com/windlively/leisure/tree/master/frame/src/main/java/ink/windlively/frame/parallelprocessor</a></p>
 
             </div>
             <hr>
